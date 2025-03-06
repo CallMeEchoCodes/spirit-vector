@@ -8,17 +8,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import symbolics.division.spirit_vector.render.SpiritVectorHUD;
 
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
-//    @Inject(
-//            method = "renderStatusBars", at = @At("HEAD")
-//    )
-//    public void appendPoiseStatusBar(DrawContext ctx, CallbackInfo ci) {
-//
-//    }
-
     @WrapOperation(
             method = "renderStatusBars",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V")
@@ -39,4 +34,11 @@ public class InGameHudMixin {
         operation.call(self, ctx, player, top, right);
         SpiritVectorHUD.renderPoise(ctx, top-10, right);
     }
+
+	@Inject(
+		method = "renderStatusBars",
+		at = @At("HEAD")
+	) public void renderSoaringWings(DrawContext context, CallbackInfo ci) {
+		SpiritVectorHUD.renderSoaring(context);
+	}
 }
