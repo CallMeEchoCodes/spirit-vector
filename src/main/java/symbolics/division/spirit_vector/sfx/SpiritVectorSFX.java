@@ -18,15 +18,17 @@ public final class SpiritVectorSFX {
     public static final SimpleSFX ROBO = registerSimple("robo", 0x54e5ac);
 //    public static final SimpleSFX DRAGON = registerSimple("dragon", 0xe14d2f);
     public static final SimpleSFX LOVE = registerSimple("love", 0xed3299);
+	public static final SimpleSFX CLOVER = registerSimple("clover", 0xbadbad);
 
     static {
         registerUnique("angel", UUID.fromString("62d5f675-f2b1-48a3-b5b6-78127cd1ed2c"));
         registerUnique("zy", UUID.fromString("0af7b31f-63a5-426d-8cee-6c54385856b6"));
         registerUnique("familiar", UUID.fromString("97f88493-9d69-42f8-b1c8-aaab1e05c89f"));
-        registerUnique("clover", UUID.fromString("4446f546-5c95-418d-9e9c-ea7efbfc31a3"));
+//        registerUnique("clover", UUID.fromString("4446f546-5c95-418d-9e9c-ea7efbfc31a3"));
         registerUnique("earth", UUID.fromString("688160b1-b946-4c18-9e65-097dff928f41"));
         registerUnique("sky", UUID.fromString("c45e97e6-94ef-42da-8b5e-0c3209551c3f"));
         registerUnique("phonomancer", UUID.fromString("f757c36c-51c9-4a77-8d46-90dd6fc77057"));
+		registerUnique("parrot", UUID.fromString("d1c66a9d-8bf9-473a-965f-315cc1272a4e"));
     }
 
     private static SimpleSFX registerSimple(String name, int color) {
