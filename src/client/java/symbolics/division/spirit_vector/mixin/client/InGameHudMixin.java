@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.render.SpiritVectorHUD;
 
 @Mixin(InGameHud.class)
@@ -19,7 +20,8 @@ public class InGameHudMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V")
     )
     public void moveBubbleRenderUp(DrawContext ctx, Identifier texture, int x, int y, int width, int height, Operation<Void> original) {
-        if (SpiritVectorHUD.numFeathers() > 0) {
+		SpiritVector sv = SpiritVectorHUD.getSpiritVector();
+        if (sv != null && SpiritVectorHUD.numFeathers(sv) > 0) {
             original.call(ctx,texture, x, y-10, width, height);
         } else {
             original.call(ctx,texture, x, y, width, height);

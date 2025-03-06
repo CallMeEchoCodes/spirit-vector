@@ -16,7 +16,13 @@ import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 
+// todo: remove gauge, superseded by HUD
+@Deprecated
 public class SpiritGaugeHUD {
+
+	public static final Identifier SLOT_LEFT = SpiritVectorMod.id("textures/gui/slot_indicator_left.png");
+	public static final Identifier SLOT_UP = SpiritVectorMod.id("textures/gui/slot_indicator_up.png");
+	public static final Identifier SLOT_RIGHT = SpiritVectorMod.id("textures/gui/slot_indicator_right.png");
 
     private static final int WIDTH = 9;
     private static final int HEIGHT = 85;
@@ -29,9 +35,6 @@ public class SpiritGaugeHUD {
     private static final Identifier BAR_BG = SpiritVectorMod.id("textures/gui/momentum_meter_bg.png");
     private static final Identifier BAR_FG = SpiritVectorMod.id("textures/gui/momentum_meter_fg.png");
     private static final Identifier BAR_VALUE = SpiritVectorMod.id("textures/gui/momentum_meter_value.png");
-    private static final Identifier SLOT_LEFT = SpiritVectorMod.id("textures/gui/slot_indicator_left.png");
-    private static final Identifier SLOT_UP = SpiritVectorMod.id("textures/gui/slot_indicator_up.png");
-    private static final Identifier SLOT_RIGHT = SpiritVectorMod.id("textures/gui/slot_indicator_right.png");
 
     private static final SpiritGaugeHUD hud = new SpiritGaugeHUD();
 
@@ -77,7 +80,7 @@ public class SpiritGaugeHUD {
         final float green = ((color >>> 8) & 0xFF) / 255f;
         final float blue = (color & 0xFF) / 255f;
 
-        this.drawTexture(
+		SpiritVectorHUD.drawTexture(
                 drawContext.getMatrices(),
                 BAR_VALUE,
                 x + 3, y + (HEIGHT + 1 - VALUE_OFFSET - visibleHeight),
@@ -107,13 +110,12 @@ public class SpiritGaugeHUD {
     }
 
     private void drawSlot(DrawContext drawContext, SpiritVector sv, Identifier slotTexture, AbilitySlot slot, int x, int baseY, int h, float r, float g, float b) {
-        // todo: please improve this
         var ability = sv.heldAbilities().get(slot);
         float cost = (float)ability.cost() / SpiritVector.MAX_MOMENTUM;
         if (cost <= 0) return;
         int offset = h - (int)(h * cost);
 
-        this.drawTexture(
+		SpiritVectorHUD.drawTexture(
                 drawContext.getMatrices(),
                 slotTexture,
                 x + SLOT_OFFSET, baseY + offset - SLOT_OFFSET,
@@ -122,25 +124,5 @@ public class SpiritGaugeHUD {
                 SLOT_WIDTH, SLOT_HEIGHT,
                 r, g, b,1
         );
-    }
-
-    private void drawTexture(MatrixStack matrices, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float r, float g, float b, float a) {
-        int x2 = x + width;
-        int y2 = y + height;
-        this.drawTexturedQuad(matrices, texture, x, x2, y, y2, 0, (u + 0.0F) / (float)textureWidth, (u + (float)width) / (float)textureWidth, (v + 0.0F) / (float)textureHeight, (v + (float)height) / (float)textureHeight, r, g, b, a);
-    }
-
-    private void drawTexturedQuad(MatrixStack matrices, Identifier texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha) {
-        RenderSystem.setShaderTexture(0, texture);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-        RenderSystem.enableBlend();
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(matrix4f, (float)x1, (float)y1, (float)z).texture(u1, v1).color(red, green, blue, alpha);
-        bufferBuilder.vertex(matrix4f, (float)x1, (float)y2, (float)z).texture(u1, v2).color(red, green, blue, alpha);
-        bufferBuilder.vertex(matrix4f, (float)x2, (float)y2, (float)z).texture(u2, v2).color(red, green, blue, alpha);
-        bufferBuilder.vertex(matrix4f, (float)x2, (float)y1, (float)z).texture(u2, v1).color(red, green, blue, alpha);
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        RenderSystem.disableBlend();
     }
 }
