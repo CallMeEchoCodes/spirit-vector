@@ -17,11 +17,13 @@ public final class InputManager {
 
     private final Map<Input, Boolean> trackedStates = new HashMap<>();
     private final Map<Input, Boolean> publicStates = new HashMap<>();
+	private final Map<Input, Boolean> releasedStates = new HashMap<>();
 
     {
         for (Input input : Input.values()) {
             trackedStates.put(input, false);
             publicStates.put(input, false);
+			releasedStates.put(input, false);
         }
     }
 
@@ -37,8 +39,18 @@ public final class InputManager {
         return publicStates.get(input);
     }
 
+	public boolean released(Input input) {
+		return releasedStates.get(input);
+	}
+
     public void update(Input input, boolean value) {
+		releasedStates.put(input, false);
         if (trackedStates.get(input) != value) {
+			// if key released and was not consumed, broadcast it was released
+			if (!value && publicStates.get(input)){
+				releasedStates.put(input, true);
+			}
+
             trackedStates.put(input, value);
             publicStates.put(input, value);
         }

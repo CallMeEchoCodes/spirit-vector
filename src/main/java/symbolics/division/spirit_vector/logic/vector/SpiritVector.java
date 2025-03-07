@@ -168,7 +168,7 @@ public class SpiritVector {
                 if (
                         ability.cost() <= getMomentum()
                         && move.testMovementCondition(this, ctx)
-                        && inputManager().consume(slot.input)
+						&& inputManager().released(slot.input)
                 ) {
                     moveState = move;
                     return;
