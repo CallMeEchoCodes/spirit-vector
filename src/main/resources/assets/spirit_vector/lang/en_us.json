@@ -5,7 +5,7 @@
   "item.spirit_vector.anima_core_love": "Anima Core \"Venus\"",
   "item.spirit_vector.anima_core_v": "Anima Core \"Catabasis\"",
   "item.spirit_vector.anima_core_robo": "Anima Core \"Axiom\"",
-	"item.spirit_vector.anima_core_clover": "Anima Core \"Usagi\"",
+  "item.spirit_vector.anima_core_clover": "Anima Core \"Usagi\"",
   "item.spirit_vector.spirit_rune_null": "Spirit Rune \"Null\"",
   "item.spirit_vector.spirit_rune_dash": "Spirit Rune \"Burst\"",
   "item.spirit_vector.spirit_rune_teleport": "Spirit Rune \"Dream\"",
@@ -57,5 +57,6 @@
   "subtitles.spirit_vector.music.perception_rebound": "Music: Perception Rebound - Nulb",
   "subtitles.spirit_vector.music.fratricide": "Music: Fratricide - Nulb",
   "jukebox_song.spirit_vector.cassette.show_done.desc": "§fShow 'Em How It's Done!!! - Nulb",
-  "jukebox_song.spirit_vector.cassette.take_break.desc": "§fTake It and Break It!!! - Nulb"
+  "jukebox_song.spirit_vector.cassette.take_break.desc": "§fTake It and Break It!!! - Nulb",
+  "gui.spirit_vector.screen.rune_matrix": "Rune Matrix"
 }

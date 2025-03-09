@@ -17,6 +17,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.*;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
@@ -35,6 +36,7 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 		FabricDataGenerator.Pack pack = generator.createPack();
 		pack.addProvider(SVModelGenerator::new);
 		pack.addProvider(SVItemTagGenerator::new);
+		pack.addProvider(SVBlockTagGenerator::new);
 		pack.addProvider(SVRecipeGenerator::new);
 		pack.addProvider(SVSoundTagGenerator::new);
 	}
@@ -88,6 +90,20 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 
 			getOrCreateTagBuilder(ItemTags.FOOT_ARMOR).add(SpiritVectorItems.SPIRIT_VECTOR);
 
+		}
+	}
+
+	private static class SVBlockTagGenerator extends FabricTagProvider.BlockTagProvider {
+		public SVBlockTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+			super(output, registriesFuture);
+		}
+
+		@Override
+		protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
+			getOrCreateTagBuilder(SpiritVectorTags.Blocks.RAIL_GRINDABLE)
+				.addOptionalTag(BlockTags.FENCES)
+				.addOptionalTag(BlockTags.FENCE_GATES)
+				.addOptionalTag(BlockTags.WALLS);
 		}
 	}
 

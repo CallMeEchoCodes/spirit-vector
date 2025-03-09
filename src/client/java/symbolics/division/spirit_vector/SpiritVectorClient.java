@@ -8,8 +8,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import symbolics.division.spirit_vector.event.JukeboxEvent;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.SVEntityState;
@@ -21,6 +24,8 @@ import symbolics.division.spirit_vector.render.SpiritGaugeHUD;
 import symbolics.division.spirit_vector.render.SpiritVectorSkatesRenderer;
 import symbolics.division.spirit_vector.render.SpiritWingsFeatureRenderer;
 import symbolics.division.spirit_vector.render.SpiritWingsModel;
+import symbolics.division.spirit_vector.screen.RuneMatrixScreen;
+import symbolics.division.spirit_vector.screen.RuneMatrixScreenHandler;
 import symbolics.division.spirit_vector.sfx.ClientSFX;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 
@@ -85,6 +90,8 @@ public class SpiritVectorClient implements ClientModInitializer {
 				}
 			}
 		}));
+
+		HandledScreens.register(RuneMatrixScreenHandler.RUNE_MATRIX,  RuneMatrixScreen::new);
 	}
 
 //	private <T extends CustomPayload>

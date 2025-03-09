@@ -6,6 +6,7 @@ import net.minecraft.registry.Registry;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbilitiesRegistry;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
+import symbolics.division.spirit_vector.screen.RuneMatrixScreenHandler;
 
 import java.util.function.Function;
 
@@ -22,5 +23,6 @@ public class SpiritVectorRegistration {
     public static void init() {
         SpiritVectorAbilitiesRegistry.init();
         VectorType.init();
+		RuneMatrixScreenHandler.init();
     }
 }

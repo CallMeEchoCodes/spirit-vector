@@ -81,6 +81,7 @@ public class SpiritVector {
     protected final MovementType[] movements = {
             MovementType.VAULT,
             MovementType.JUMP,
+//			MovementType.GRIND,
             MovementType.SLIDE,
             MovementType.WALL_JUMP,
             MovementType.WALL_RUSH

@@ -26,7 +26,6 @@ public class DreamRuneItem extends Item {
         SpiritVectorAbility ability = stack.getOrDefault(SpiritVectorAbility.COMPONENT, SpiritVectorAbility.NONE);
         tooltip.add(Text.translatable("tooltip.spirit_vector.dream_rune_contents", Text.translatable(ability.getMovement().getTranslationKey()).withColor(0xfffffff)).withColor(0x808080));
 
-        // this is so insanely cursed just look at the blame timestamp to know why
         String desc = Text.translatable("tooltip.desc." + ability.abilityTranslationKey()).getString();
         final int MAX_CHARS_PER_LINE = 25;
         String wrapped = WordUtils.wrap(desc, MAX_CHARS_PER_LINE,"%%", false);

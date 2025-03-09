@@ -1,6 +1,7 @@
 package symbolics.division.spirit_vector;
 
 import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -24,6 +25,11 @@ public class SpiritVectorTags {
     public static final class Misc {
         public static final TagKey<SoundEvent> JUKEBOX_LOOPING = ofRegistry(RegistryKeys.SOUND_EVENT, "jukebox_looping");
     }
+
+	public static final class Blocks {
+		private static TagKey<Block> of(String name) { return ofRegistry(RegistryKeys.BLOCK, name); }
+		public static final TagKey<Block> RAIL_GRINDABLE = of("rail_grindable");
+	}
 
     private static <T> TagKey<T> ofRegistry(RegistryKey<? extends Registry<T>> key, String name) {
         return TagKey.of(key, SpiritVectorMod.id(name));

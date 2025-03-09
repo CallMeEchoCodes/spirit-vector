@@ -43,6 +43,7 @@ public interface MovementType {
     MovementType VAULT = new LedgeVaultMovement(SpiritVectorMod.id("vault"));
     MovementType JUMP = new JumpingMovement(SpiritVectorMod.id("jump"));
     MovementType WALL_RUSH = new WallRushMovement(SpiritVectorMod.id("wall_rush"));
+	MovementType GRIND = new GrindMovement(SpiritVectorMod.id("grind"));
 //    public static MovementType GRIND = new MovementType(id("grind"));
 
 }
