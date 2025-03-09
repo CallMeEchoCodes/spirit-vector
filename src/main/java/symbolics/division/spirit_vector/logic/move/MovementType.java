@@ -25,6 +25,7 @@ public interface MovementType {
 
     default boolean disableDrag(SpiritVector sv) { return false; }
 
+	default void exit(SpiritVector sv, TravelMovementContext ctx) { exit(sv); }
     default void exit(SpiritVector sv) {}
 
     default boolean fluidMovementAllowed(SpiritVector sv) { return false; }
@@ -44,6 +45,7 @@ public interface MovementType {
     MovementType JUMP = new JumpingMovement(SpiritVectorMod.id("jump"));
     MovementType WALL_RUSH = new WallRushMovement(SpiritVectorMod.id("wall_rush"));
 	MovementType GRIND = new GrindMovement(SpiritVectorMod.id("grind"));
+	MovementType SPELL = new SpellMovement(SpiritVectorMod.id("spell"));
 //    public static MovementType GRIND = new MovementType(id("grind"));
 
 }

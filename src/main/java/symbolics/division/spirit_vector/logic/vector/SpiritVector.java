@@ -79,6 +79,7 @@ public class SpiritVector {
 
     // these are checked in order prior to rune movements
     protected final MovementType[] movements = {
+			MovementType.SPELL,
             MovementType.VAULT,
             MovementType.JUMP,
 //			MovementType.GRIND,
@@ -147,7 +148,7 @@ public class SpiritVector {
 
     private void updateMovementType(TravelMovementContext ctx) {
         if (!moveState.testMovementCompleted(this, ctx)) return;
-        moveState.exit(this);
+        moveState.exit(this, ctx);
 
         // first check standard movements
         for (MovementType m : movements) {

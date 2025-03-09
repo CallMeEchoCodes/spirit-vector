@@ -36,6 +36,7 @@ public final class SpiritVectorMod implements ModInitializer {
 		LOGGER.info("Fly forth, Spirit Vector!");
 		SpiritVectorRegistration.init();
 		SpiritVectorItems.init();
+		SpiritVectorBlocks.init();
 		SpiritVectorSounds.init();
 		SpiritVectorTags.init();
 		SpiritVectorLoot.init();
