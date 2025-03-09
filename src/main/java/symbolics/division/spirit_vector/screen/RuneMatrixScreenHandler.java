@@ -1,5 +1,6 @@
 package symbolics.division.spirit_vector.screen;
 
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -17,6 +18,12 @@ import net.minecraft.util.Hand;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.item.DreamRuneItem;
 import symbolics.division.spirit_vector.item.SpiritVectorItem;
+import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
+import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbilitiesRegistry;
+import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbility;
+import symbolics.division.spirit_vector.logic.ability.SpiritVectorHeldAbilities;
+
+import java.util.Objects;
 
 public class RuneMatrixScreenHandler extends ScreenHandler {
 	public static ScreenHandlerType<RuneMatrixScreenHandler> RUNE_MATRIX =
@@ -36,7 +43,13 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 
 	private final ScreenHandlerContext context ;
 	private final Property vectorMode = Property.create();
-	private final Inventory storage = new SimpleInventory(3);
+	private final Inventory storage = new SimpleInventory(3) {
+		@Override
+		public void markDirty() {
+			super.markDirty();
+			RuneMatrixScreenHandler.this.onContentChanged(this);
+		}
+	};
 	private final Slot leftSlot;
 	private final Slot upSlot;
 	private final Slot rightSlot;
@@ -50,9 +63,12 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	public RuneMatrixScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
 		super(RUNE_MATRIX, syncId);
 		this.context = context;
-		this.leftSlot = this.addSlot(new RuneSlot(this.storage, 0, 100, 100));
-		this.upSlot  = this.addSlot(new RuneSlot(this.storage, 1, 200, 100));
-		this.rightSlot  = this.addSlot(new RuneSlot(this.storage, 2, 300, 100));
+
+		int slotLeftOffset = 56;
+		int slotTopOffset = 7;
+		this.leftSlot = this.addSlot(new RuneSlot(this.storage, 0, slotLeftOffset, slotTopOffset + 25));
+		this.upSlot  = this.addSlot(new RuneSlot(this.storage, 1, slotLeftOffset + 25 , slotTopOffset));
+		this.rightSlot  = this.addSlot(new RuneSlot(this.storage, 2, slotLeftOffset + 50, slotTopOffset + 25));
 
 		this.addProperty(this.vectorMode);
 
@@ -76,6 +92,17 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 		}
 		this.svItem = playerInventory.player.getStackInHand(currentHand);
 		playerInventory.player.setStackInHand(currentHand, ItemStack.EMPTY);
+
+		ComponentMap components = this.svItem.getComponents();
+		SpiritVectorHeldAbilities abilities = components.get(SpiritVectorHeldAbilities.COMPONENT);
+		if (abilities != null) {
+			for (AbilitySlot slot : AbilitySlot.values()) {
+				SpiritVectorAbility ability = abilities.get(slot);
+				if (ability != SpiritVectorAbility.NONE) {
+					getRuneSlot(slot).setStack(SpiritVectorAbilitiesRegistry.getRuneForAbility(ability).getDefaultStack());
+				}
+			}
+		}
 	}
 
 	@Override
@@ -87,11 +114,11 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 			originalStack = stack.copy();
 			if (slot.id == leftSlot.id  || slot.id == upSlot.id  || slot.id == rightSlot.id) {
 				// rune slots to inv
-				if (!this.insertItem(stack, 4, 40, true)) {
+				if (!this.insertItem(stack, 3, 39, true)) {
 					return ItemStack.EMPTY;
 				}
 				slot.onQuickTransfer(stack, stack);
-			} else if (slot.id >= 4 && slot.id < 40 && stack.getItem() instanceof DreamRuneItem) {
+			} else if (slot.id >= 3 && slot.id < 39 && stack.getItem() instanceof DreamRuneItem) {
 				Slot[] runeSlots = {leftSlot, upSlot, rightSlot};
 				for (Slot runeSlot : runeSlots) {
 					if (!runeSlot.hasStack() && !this.insertItem(stack, runeSlot.id, runeSlot.id + 1, false)) {
@@ -136,5 +163,28 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	@Override
 	public void onContentChanged(Inventory inventory) {
 		super.onContentChanged(inventory);
+		SpiritVectorHeldAbilities newAbilities = new SpiritVectorHeldAbilities();
+		SpiritVectorHeldAbilities oldAbilities = svItem.getComponents().getOrDefault(
+			SpiritVectorHeldAbilities.COMPONENT,
+			new SpiritVectorHeldAbilities()
+		);
+		for (AbilitySlot abilitySlot : AbilitySlot.values()) {
+			newAbilities.set(abilitySlot, oldAbilities.get(abilitySlot));
+			Slot slot = getRuneSlot(abilitySlot);
+			ItemStack stack = slot.getStack();
+			if (stack != null) {
+				SpiritVectorAbility ability = stack.getComponents().get(SpiritVectorAbility.COMPONENT);
+				newAbilities.set(abilitySlot, Objects.requireNonNullElse(ability, SpiritVectorAbility.NONE));
+			}
+		}
+		svItem.set(SpiritVectorHeldAbilities.COMPONENT, newAbilities);
+	}
+
+	private Slot getRuneSlot(AbilitySlot slot) {
+		return switch (slot) {
+			case AbilitySlot.LEFT -> this.leftSlot;
+			case AbilitySlot.UP -> this.upSlot;
+			case AbilitySlot.RIGHT -> this.rightSlot;
+		};
 	}
 }

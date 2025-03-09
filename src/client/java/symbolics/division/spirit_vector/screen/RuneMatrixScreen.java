@@ -31,4 +31,10 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 	private void onInventoryChanged() {
 
 	}
+
+	@Override
+	protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+		// just ensure we're in the correct column
+		return super.isClickOutsideBounds(mouseX, top, left, top, button);
+	}
 }

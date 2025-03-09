@@ -7,7 +7,9 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.Identifier;
+import symbolics.division.spirit_vector.SpiritVectorItems;
 import symbolics.division.spirit_vector.SpiritVectorMod;
+import symbolics.division.spirit_vector.item.DreamRuneItem;
 import symbolics.division.spirit_vector.logic.move.MovementType;
 
 import java.util.function.Function;
