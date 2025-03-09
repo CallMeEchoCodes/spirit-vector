@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import symbolics.division.spirit_vector.SpiritVectorMod;
@@ -17,9 +18,11 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 
 	private static final int MODE_SLOT_LEFT_OFFSET = 56 + 25;
 	private static final int MODE_SLOT_TOP_OFFSET = 7 + 50;
-
 	private Identifier modeSprite = SpiritVectorMod.id("rune_matrix/vector_mode_spirit");
 	private int prevMode = 0;
+
+	private static final int SLOT_FULL_SIZE = 28;
+	private static final Identifier SLOT_FULL_TEXTURE = SpiritVectorMod.id("rune_matrix/slot_full");
 
 	public RuneMatrixScreen(RuneMatrixScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
@@ -44,6 +47,17 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 		}
 		context.drawGuiTexture(this.modeSprite, this.x + MODE_SLOT_LEFT_OFFSET, this.y+MODE_SLOT_TOP_OFFSET, 16, 16);
 //		context.drawTexture(this.modeSprite, this.x + MODE_SLOT_LEFT_OFFSET, this.y+MODE_SLOT_TOP_OFFSET, 0, 0, this.backgroundWidth,  this.backgroundHeight);
+
+		int slotLeftOffset = 56;
+		int slotTopOffset = 7;
+		renderSlotInset(context, this.handler.leftSlot, 0, 0);
+		renderSlotInset(context, this.handler.upSlot, 25, -25);
+		renderSlotInset(context, this.handler.rightSlot, 50, 0);
+	}
+
+	private void renderSlotInset(DrawContext context, Slot slot, int x, int y) {
+		if (!slot.hasStack()) return;
+		context.drawGuiTexture(SLOT_FULL_TEXTURE, this.x + 50 + x, this.y + 26 + y, SLOT_FULL_SIZE, SLOT_FULL_SIZE);
 	}
 
 	@Override

@@ -55,9 +55,9 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 			RuneMatrixScreenHandler.this.onContentChanged(this);
 		}
 	};
-	private final Slot leftSlot;
-	private final Slot upSlot;
-	private final Slot rightSlot;
+	public final Slot leftSlot;
+	public final Slot upSlot;
+	public final Slot rightSlot;
 //	private ItemStack svItem = ItemStack.EMPTY;
 	private final Hand currentHand;
 	private final PlayerEntity player;
