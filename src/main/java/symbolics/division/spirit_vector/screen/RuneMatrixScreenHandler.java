@@ -14,8 +14,12 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
+import net.minecraft.world.World;
 import symbolics.division.spirit_vector.SpiritVectorMod;
+import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.item.DreamRuneItem;
 import symbolics.division.spirit_vector.item.SpiritVectorItem;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
@@ -53,8 +57,9 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	private final Slot leftSlot;
 	private final Slot upSlot;
 	private final Slot rightSlot;
-	private ItemStack svItem = ItemStack.EMPTY;
+//	private ItemStack svItem = ItemStack.EMPTY;
 	private final Hand currentHand;
+	private final PlayerEntity player;
 
 	public RuneMatrixScreenHandler(int syncId, PlayerInventory playerInventory) {
 		this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
@@ -63,6 +68,8 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	public RuneMatrixScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
 		super(RUNE_MATRIX, syncId);
 		this.context = context;
+		this.player = playerInventory.player;
+		player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SpiritVectorSounds.RUNE_MATRIX_CLICK, SoundCategory.PLAYERS, 1.0f, 1);
 
 		int slotLeftOffset = 56;
 		int slotTopOffset = 7;
@@ -90,10 +97,8 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 		} else {
 			currentHand = Hand.OFF_HAND;
 		}
-		this.svItem = playerInventory.player.getStackInHand(currentHand);
-		playerInventory.player.setStackInHand(currentHand, ItemStack.EMPTY);
 
-		ComponentMap components = this.svItem.getComponents();
+		ComponentMap components = getTargetStack().getComponents();
 		SpiritVectorHeldAbilities abilities = components.get(SpiritVectorHeldAbilities.COMPONENT);
 		if (abilities != null) {
 			for (AbilitySlot slot : AbilitySlot.values()) {
@@ -149,35 +154,34 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	}
 
 	@Override
-	public void onClosed(PlayerEntity player) {
-		super.onClosed(player);
-		if (player.getStackInHand(this.currentHand).isEmpty()) {
-			player.setStackInHand(this.currentHand, this.svItem);
-		} else {
-			if (!player.getInventory().insertStack(this.svItem)) {
-				player.dropItem(this.svItem, true);
-			}
+	public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+		int ix = player.getInventory().selectedSlot;
+		if (actionType != SlotActionType.THROW && currentHand == Hand.MAIN_HAND && ix == slotIndex-30) {
+			return;
 		}
+		super.onSlotClick(slotIndex, button, actionType, player);
 	}
 
 	@Override
 	public void onContentChanged(Inventory inventory) {
 		super.onContentChanged(inventory);
+		ItemStack stack = getTargetStack().copy();
 		SpiritVectorHeldAbilities newAbilities = new SpiritVectorHeldAbilities();
-		SpiritVectorHeldAbilities oldAbilities = svItem.getComponents().getOrDefault(
+		SpiritVectorHeldAbilities oldAbilities = stack.getComponents().getOrDefault(
 			SpiritVectorHeldAbilities.COMPONENT,
 			new SpiritVectorHeldAbilities()
 		);
 		for (AbilitySlot abilitySlot : AbilitySlot.values()) {
 			newAbilities.set(abilitySlot, oldAbilities.get(abilitySlot));
 			Slot slot = getRuneSlot(abilitySlot);
-			ItemStack stack = slot.getStack();
-			if (stack != null) {
-				SpiritVectorAbility ability = stack.getComponents().get(SpiritVectorAbility.COMPONENT);
+			ItemStack runeStack = slot.getStack();
+			if (runeStack != null) {
+				SpiritVectorAbility ability = runeStack.getComponents().get(SpiritVectorAbility.COMPONENT);
 				newAbilities.set(abilitySlot, Objects.requireNonNullElse(ability, SpiritVectorAbility.NONE));
 			}
 		}
-		svItem.set(SpiritVectorHeldAbilities.COMPONENT, newAbilities);
+		stack.set(SpiritVectorHeldAbilities.COMPONENT, newAbilities);
+		setTargetStack(stack);
 	}
 
 	private Slot getRuneSlot(AbilitySlot slot) {
@@ -186,5 +190,13 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 			case AbilitySlot.UP -> this.upSlot;
 			case AbilitySlot.RIGHT -> this.rightSlot;
 		};
+	}
+
+	private ItemStack getTargetStack() {
+		return player.getStackInHand(this.currentHand);
+	}
+
+	private void setTargetStack(ItemStack stack) {
+		player.setStackInHand(currentHand, stack);
 	}
 }

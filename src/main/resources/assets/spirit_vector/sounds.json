@@ -29,6 +29,18 @@
       "spirit_vector:step"
     ]
   },
+  "sfx.rune_matrix.click": {
+	"subtitle": "subtitles.spirit_vector.rune_matrix.click",
+	"sounds": [
+		"spirit_vector:rm_click"
+	]
+  },
+  "sfx.rune_matrix.ambiance": {
+    "subtitle": "subtitles.spirit_vector.rune_matrix.ambiance",
+    "sounds": [
+	  "spirit_vector:rm_ambiance"
+    ]
+  },
   "cassette.take_break": {
     "subtitle": "subtitles.spirit_vector.cassette.take_break",
     "sounds": [

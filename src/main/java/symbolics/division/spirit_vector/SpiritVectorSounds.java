@@ -12,6 +12,9 @@ public class SpiritVectorSounds {
     public static final SoundEvent SLIDE_START = register("sfx.slide_start");
     public static final SoundEvent ENGINE = register("sfx.engine");
 
+	public static final SoundEvent RUNE_MATRIX_CLICK = register("sfx.rune_matrix.click");
+	public static final SoundEvent RUNE_MATRIX_AMBIANCE = register("sfx.rune_matrix.ambiance");
+
     public static final SoundEvent TAKE_BREAK_LOOP = register("cassette.take_break");
     public static final SoundEvent TAKE_BREAK_SONG = register("music.take_break");
     public static final SoundEvent SHOW_DONE_LOOP = register("cassette.show_done");
