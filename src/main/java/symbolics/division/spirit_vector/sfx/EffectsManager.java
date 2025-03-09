@@ -2,7 +2,10 @@ package symbolics.division.spirit_vector.sfx;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -25,7 +28,9 @@ public class EffectsManager {
             spawnRingImpl((ServerWorld)player.getWorld(), payload.pack(), new Vec3d(payload.pos()), new Vec3d(payload.dir()));
         } else if (payload.type().equals(SFXRequestPayload.BURST_SOUND_TYPE)) {
             playBurstImpl(player, new Vec3d(payload.pos()));
-        }
+        } else if (payload.type().equals(SFXRequestPayload.KICKOFF_EFFECT_TYPE)) {
+			kickoffImpl((ServerWorld) player.getWorld(), new Vec3d(payload.pos()));
+		}
     }
 
     private static Consumer<SFXRequestPayload> requestCallback = c -> {};
@@ -57,6 +62,15 @@ public class EffectsManager {
         }
     }
 
+	public void kickoff(Vec3d pos) {
+		World world = sv.user.getWorld();
+		if (world.isClient) {
+			requestCallback.accept(new SFXRequestPayload(SFXRequestPayload.KICKOFF_EFFECT_TYPE, sv.getSFX(), pos.toVector3f(), new Vector3f()));
+		} else {
+			kickoffImpl((ServerWorld) world, pos);
+		}
+	}
+
     // TODO a nonstaticified version of this
     private static void spawnParticleImpl(ServerWorld world, SFXPack<?> sfx, Vec3d pos) {
         world.spawnParticles(
@@ -75,6 +89,11 @@ public class EffectsManager {
             );
         }
     }
+
+	private static void kickoffImpl(ServerWorld world, Vec3d pos) {
+		world.playSound(null, BlockPos.ofFloored(pos), SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 0.3f, 0.8f);
+		world.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.x, pos.y, pos.z, 10, 0.3, 0.1, 0.3, 0.01);
+	}
 
     // return u, v for Householder reflector
     private static Vec3d[] basis(Vec3d vec) {

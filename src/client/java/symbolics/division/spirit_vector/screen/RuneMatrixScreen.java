@@ -86,4 +86,6 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 		var id = vectorMode.getKey().orElseThrow().getValue().getPath();
 		return SpiritVectorMod.id("rune_matrix/vector_mode_" + id);
 	}
+
+
 }

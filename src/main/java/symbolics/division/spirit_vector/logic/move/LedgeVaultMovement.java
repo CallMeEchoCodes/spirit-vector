@@ -40,21 +40,30 @@ public class LedgeVaultMovement extends AbstractMovementType {
     public void travel(SpiritVector sv, TravelMovementContext ctx) {
         sv.stateManager().clearTicks(VAULT_STATE_ID);
         Vec3d result;
+		boolean vault = false;
         if (ctx.inputDir().lengthSquared() < 0.1) {          // no input, vault
             result = new Vec3d(0, 0.9, 0);
+			vault = true;
         } else {                                             // input: ledgetrick
             // remove this check if its too confusing
             double y = Math.abs(sv.user.getRotationVector().y);
             result = ctx.inputDir().withAxis(Direction.Axis.Y, Math.max(0.3, y)).normalize();
         }
-        sv.user.addVelocity(result.multiply(VAULT_SPEED *  sv.consumeSpeedMultiplier()));
+
+		if (!vault && sv.getType().equals(VectorType.BURST)) {
+			// burst always has fixed velocity change, for precision
+			sv.user.setVelocity(result.multiply(VAULT_SPEED *  sv.consumeSpeedMultiplier()));
+		} else {
+			sv.user.addVelocity(result.multiply(VAULT_SPEED *  sv.consumeSpeedMultiplier()));
+		}
+
         sv.effectsManager().spawnRing(sv.user.getPos(), result);
         NEUTRAL.travel(sv, ctx);
     }
 
     @Override
     public void updateValues(SpiritVector sv) {
-        if (sv.getType().equals(VectorType.SPIRIT)) {
+        if (!sv.getType().equals(VectorType.DREAM)) {
             sv.modifyMomentum(MOMENTUM_GAINED);
             sv.stateManager().enableStateFor(SpiritVector.MOMENTUM_DECAY_GRACE_STATE, 20);
         }

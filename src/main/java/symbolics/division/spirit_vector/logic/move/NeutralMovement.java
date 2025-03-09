@@ -45,6 +45,7 @@ public class NeutralMovement extends AbstractMovementType {
         }
 
         double gravity = user.getFinalGravity();
+		if (sv.getType().equals(VectorType.BURST) && user.getVelocity().y < 0) gravity *= 0.6;
         boolean movingDownwards = user.getVelocity().y <= 0.0;
         if (movingDownwards && user.hasStatusEffect(StatusEffects.SLOW_FALLING)) {
             gravity = Math.min(gravity, 0.01);
@@ -94,6 +95,13 @@ public class NeutralMovement extends AbstractMovementType {
     @Override
     public void updateValues(SpiritVector sv) {
         if (sv.getType().equals(VectorType.DREAM) && sv.horizontalSpeed() >= DreamVector.MOMENTUM_GAIN_SPEED) return;
+		if (sv.getType().equals(VectorType.BURST)) {
+			if (sv.user.isOnGround()) {
+				sv.modifyMomentum(-sv.getMomentum());
+			} else {
+				return;
+			}
+		}
         if (sv.user.age % 20 == 0 && !sv.stateManager().isActive(SpiritVector.MOMENTUM_DECAY_GRACE_STATE)) {
             sv.modifyMomentum(-1);
         }

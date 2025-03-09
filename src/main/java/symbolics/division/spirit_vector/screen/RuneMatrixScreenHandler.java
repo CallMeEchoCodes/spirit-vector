@@ -44,6 +44,7 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	private static class RuneSlot extends Slot {
 		public RuneSlot(Inventory inventory, int index, int x, int y) { super(inventory, index, x, y); }
 		@Override public boolean canInsert(ItemStack stack) {return stack.getItem() instanceof DreamRuneItem; }
+		@Override public boolean canBeHighlighted() { return false; }
 	}
 
 	private final ScreenHandlerContext context ;
