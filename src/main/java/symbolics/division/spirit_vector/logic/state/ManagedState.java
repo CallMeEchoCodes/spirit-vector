@@ -26,7 +26,7 @@ public class ManagedState implements IManagedState {
     public void disable() {
         semaphore--;
         if (semaphore < 0) {
-            // if someone tries to disable without enabling first, someone messed up in the chain
+            // if someone tried to disable without enabling first, someone messed up in the chain
             // we don't want to perpetuate bad state, so...
             throw new RuntimeException("Attempted to disable effect state while not enabled");
         }

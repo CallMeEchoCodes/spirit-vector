@@ -25,6 +25,9 @@ import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 import symbolics.division.spirit_vector.logic.ability.GroundPoundAbility;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbility;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorHeldAbilities;
+import symbolics.division.spirit_vector.logic.input.Arrow;
+import symbolics.division.spirit_vector.logic.input.ArrowManager;
+import symbolics.division.spirit_vector.logic.input.FeedbackManager;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.move.MovementType;
@@ -36,6 +39,8 @@ import symbolics.division.spirit_vector.logic.state.StateManager;
 import symbolics.division.spirit_vector.logic.state.WingsEffectState;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXPack;
+
+import java.util.Arrays;
 
 public class SpiritVector {
 
@@ -73,6 +78,7 @@ public class SpiritVector {
     protected final EffectsManager effectsManager;
     protected final StateManager stateManager = new StateManager();
     protected final InputManager inputManager = new InputManager();
+	protected final ArrowManager arrowManager = new ArrowManager();
     protected final SFXPack<?> sfx;
     protected final SpiritVectorHeldAbilities abilities;
     protected final VectorType type;
@@ -241,6 +247,8 @@ public class SpiritVector {
     public StateManager stateManager() { return stateManager; }
 
     public InputManager inputManager() { return inputManager; }
+
+	public ArrowManager arrowManager() { return arrowManager; }
 
     public SpiritVectorHeldAbilities heldAbilities() {
         return abilities;

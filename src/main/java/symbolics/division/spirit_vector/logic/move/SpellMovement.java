@@ -4,10 +4,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
+import symbolics.division.spirit_vector.logic.input.ArrowManager;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
+import symbolics.division.spirit_vector.logic.input.Arrow;
+import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpellMovement extends NeutralMovement {
 	private static final Identifier CASTING_STATE_ID = SpiritVectorMod.id("casting_spell");
@@ -19,7 +25,7 @@ public class SpellMovement extends NeutralMovement {
 
 	@Override
 	public void configure(SpiritVector sv) {
-		sv.stateManager().register(CASTING_STATE_ID, new ManagedState(sv));
+		sv.stateManager().register(CASTING_STATE_ID, new SpellcastingState(sv));
 	}
 
 	@Override
@@ -34,7 +40,8 @@ public class SpellMovement extends NeutralMovement {
 			input.consume(Input.CROUCH);
 			input.consume(Input.SPRINT);
 			input.consume(Input.JUMP);
-//			SpiritVectorMod.LOGGER.info("spell dimension!");
+			((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
+			sv.arrowManager().consumeAll();
 			sv.stateManager().enableStateFor(CASTING_STATE_ID, MAX_CASTING_TICKS);
 			return true;
 		}
@@ -57,10 +64,44 @@ public class SpellMovement extends NeutralMovement {
 	@Override
 	public void travel(SpiritVector sv, TravelMovementContext ctx) {
 		if (sv.inputManager().consume(Input.JUMP)) {
-//			SpiritVectorMod.LOGGER.info("spell cast!");
+			Spell.cast(sv, ((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).eigenCode());
 			sv.stateManager().clearTicks(CASTING_STATE_ID);
 		}
 		SlideMovement.travelWithInput(sv, Vec3d.ZERO);
 		ctx.ci().cancel();
+	}
+
+	private static class SpellcastingState extends ManagedState {
+		private final List<Arrow> eigenCode = new ArrayList<>();
+		private static final int MAX_CODE_LENGTH = 16;
+
+		public SpellcastingState(SpiritVector sv) {
+			super(sv);
+		}
+
+		public void resetInputs() {
+			eigenCode.clear();
+		}
+
+		@Override
+		public void tick() {
+			super.tick();
+			if (isActive() && eigenCode.size() < MAX_CODE_LENGTH) {
+				ArrowManager arrows = sv.arrowManager();
+				if (arrows.consume(Arrow.UP)) {
+					eigenCode.add(Arrow.UP);
+				} else if (arrows.consume(Arrow.DOWN)) {
+					eigenCode.add(Arrow.DOWN);
+				} else if (arrows.consume(Arrow.LEFT)) {
+					eigenCode.add(Arrow.LEFT);
+				} else if (arrows.consume(Arrow.RIGHT)) {
+					eigenCode.add(Arrow.RIGHT);
+				}
+			}
+		}
+
+		public List<Arrow> eigenCode() {
+			return List.copyOf(eigenCode);
+		}
 	}
 }
