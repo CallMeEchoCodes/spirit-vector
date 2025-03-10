@@ -9,7 +9,7 @@ import net.minecraft.registry.Registry;
 
 public class SpiritVectorBlocks {
 	public static final Block MATERIA = of("materia", new Block(
-		AbstractBlock.Settings.create().mapColor(MapColor.STONE_GRAY).strength(-1, 3600000).dropsNothing().allowsSpawning(Blocks::never)
+		AbstractBlock.Settings.create().mapColor(MapColor.STONE_GRAY).strength(-1, 3600000).dropsNothing().allowsSpawning(Blocks::never).solidBlock(Blocks::never).nonOpaque()
 	));
 
 	private static Block of(String id, Block block) {

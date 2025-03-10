@@ -1,6 +1,7 @@
 package symbolics.division.spirit_vector;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
@@ -10,12 +11,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRe
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import symbolics.division.spirit_vector.event.JukeboxEvent;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.SVEntityState;
+import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
@@ -92,6 +95,10 @@ public class SpiritVectorClient implements ClientModInitializer {
 		}));
 
 		HandledScreens.register(RuneMatrixScreenHandler.RUNE_MATRIX,  RuneMatrixScreen::new);
+
+		ClientTickEvents.START_WORLD_TICK.register(world -> SpellDimension.worldTick());
+
+		BlockRenderLayerMap.INSTANCE.putBlock(SpiritVectorBlocks.MATERIA, RenderLayer.getTranslucent());
 	}
 
 //	private <T extends CustomPayload>

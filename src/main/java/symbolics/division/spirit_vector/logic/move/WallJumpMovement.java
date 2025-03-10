@@ -100,7 +100,6 @@ public class WallJumpMovement extends AbstractMovementType {
 
     @Override
     public void travel(SpiritVector sv, TravelMovementContext ctx) {
-//        var input = MovementUtils.augmentedInput(sv, ctx);
         var result = getWalljumpingInput(sv, ctx);
         if (result == null) { // input invalid
             NEUTRAL.travel(sv, ctx);

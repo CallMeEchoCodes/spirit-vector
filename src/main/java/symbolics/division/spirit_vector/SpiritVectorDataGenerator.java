@@ -49,7 +49,7 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-
+			blockStateModelGenerator.registerSimpleCubeAll(SpiritVectorBlocks.MATERIA);
 		}
 
 		@Override

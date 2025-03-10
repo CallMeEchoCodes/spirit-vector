@@ -1,17 +1,18 @@
 {
-	"required": true,
-	"package": "symbolics.division.spirit_vector.mixin.client",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-      "ClientPlayerEntityMixin",
-      "GameRendererMixin",
-      "BipedEntityModelMixin",
-      "AbstractClientPlayerEntityMixin",
-      "WorldRendererMixin",
-      "DebugHudMixin",
-      "InGameHudMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "symbolics.division.spirit_vector.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "AbstractClientPlayerEntityMixin",
+    "BackgroundRendererMixin",
+    "BipedEntityModelMixin",
+    "ClientPlayerEntityMixin",
+    "DebugHudMixin",
+    "GameRendererMixin",
+    "InGameHudMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

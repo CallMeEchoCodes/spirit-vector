@@ -9,6 +9,7 @@ import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.spell.Spell;
+import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
@@ -64,7 +65,7 @@ public class SpellMovement extends NeutralMovement {
 	@Override
 	public void travel(SpiritVector sv, TravelMovementContext ctx) {
 		if (sv.inputManager().consume(Input.JUMP)) {
-			Spell.cast(sv, ((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).eigenCode());
+			SpellDimension.cast(new Spell(sv, ((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).eigenCode()));
 			sv.stateManager().clearTicks(CASTING_STATE_ID);
 		}
 		SlideMovement.travelWithInput(sv, Vec3d.ZERO);
@@ -73,7 +74,7 @@ public class SpellMovement extends NeutralMovement {
 
 	private static class SpellcastingState extends ManagedState {
 		private final List<Arrow> eigenCode = new ArrayList<>();
-		private static final int MAX_CODE_LENGTH = 16;
+
 
 		public SpellcastingState(SpiritVector sv) {
 			super(sv);
@@ -86,7 +87,7 @@ public class SpellMovement extends NeutralMovement {
 		@Override
 		public void tick() {
 			super.tick();
-			if (isActive() && eigenCode.size() < MAX_CODE_LENGTH) {
+			if (isActive() && eigenCode.size() < Spell.MAX_CODE_LENGTH) {
 				ArrowManager arrows = sv.arrowManager();
 				if (arrows.consume(Arrow.UP)) {
 					eigenCode.add(Arrow.UP);
