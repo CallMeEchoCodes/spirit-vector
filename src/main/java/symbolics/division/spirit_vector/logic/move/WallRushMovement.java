@@ -52,7 +52,7 @@ public class WallRushMovement extends AbstractMovementType {
             sv.inputManager().consume(Input.CROUCH);
             sv.stateManager().enableStateFor(
                     WALL_CLING_STATE,
-                    sv.getType().equals(VectorType.DREAM) ? Integer.MAX_VALUE : WALL_CLING_TICKS
+                    sv.is(VectorType.DREAM) ? Integer.MAX_VALUE : WALL_CLING_TICKS
             );
             return true;
         }
@@ -106,14 +106,14 @@ public class WallRushMovement extends AbstractMovementType {
 
     @Override
     public void updateValues(SpiritVector sv) {
-		if (sv.getType().equals(VectorType.BURST)) {
+		if (sv.is(VectorType.BURST)) {
 			Vec3d vel = sv.user.getVelocity();
 			if (MathHelper.approximatelyEquals(Math.abs(vel.x) + Math.abs(vel.y) + Math.abs(vel.z), 0)) {
 				return;
 			}
 		}
         if (sv.user.age % 10 == 0 && sv.stateManager().isActive(WALL_CLING_STATE)) {
-            if (sv.getType().equals(VectorType.DREAM)) {
+            if (sv.is(VectorType.DREAM)) {
                 sv.modifyMomentum(DreamVector.MOMENTUM_GAIN_PER_SECOND / 4);
             } else {
 				sv.modifyMomentum(1);

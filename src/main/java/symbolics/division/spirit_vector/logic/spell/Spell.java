@@ -1,20 +1,23 @@
 package symbolics.division.spirit_vector.logic.spell;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayPriorityQueue;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import it.unimi.dsi.fastutil.PriorityQueue;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
+import symbolics.division.spirit_vector.logic.vector.VectorType;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Spell {
 	public static final int MAX_CODE_LENGTH = 16;
@@ -32,8 +35,9 @@ public class Spell {
 	private final float complexity;
 	private int ticksLeft = 0;
 	private final SpiritVector sv;
-	private final List<BlockPos> anchors = new ArrayList<>();
+	private final PriorityQueue<BlockPos> anchors;
 	private final BlockPos center;
+	private Consumer<BlockPos> placementCallback = b -> {};
 
 	public Spell(SpiritVector sv, List<Arrow> eigenCode) {
 		this.sv = sv;
@@ -53,26 +57,20 @@ public class Spell {
 		SpiritVectorMod.LOGGER.info("complexity: " + complexity);
 		SpiritVectorMod.LOGGER.info("decay: " + decay);
 
-//		BlockPos ppos = sv.user.getBlockPos();
-//		BlockPos.Mutable bp = new BlockPos.Mutable();
-//		for (int x = -(int)spellRadius; x < spellRadius; x++) {
-//			for (int y = -(int)spellRadius; y < spellRadius; y++) {
-//				for (int z = -(int)spellRadius; z < spellRadius; z++) {
-//					if (x % EIDOS_SPACING_HORIZONTAL == 0 && z % EIDOS_SPACING_HORIZONTAL == 0 && y % EIDOS_SPACING_VERTICAL == 0) {
-//						Direction d = Direction.byId((x + y * 2 + z * 3) % 4 + 2);
-//						bp.set(ppos.getX() + x, ppos.getY() + y, ppos.getZ() + z);
-//						spell.core.emplace(world, bp, d, decay);
-//					}
-//				}
-//			}
-//		}
+		this.center = sv.user.getBlockPos();
 
-		center = sv.user.getBlockPos();
+		if (sv.is(VectorType.DREAM)) {
+			// sort spherically
+			this.anchors = new ObjectArrayPriorityQueue<>((a1, a2) -> Double.compare(a1.getSquaredDistance(center), a2.getSquaredDistance(center)));
+		} else {
+			this.anchors = new ObjectArrayPriorityQueue<>((a1, a2) -> Integer.compare(a1.getManhattanDistance(center), a2.getManhattanDistance(center)));
+		}
+
 		for (int x = -(int)maxSpellRadius; x < maxSpellRadius; x++) {
 			for (int y = -(int)maxSpellRadius; y < maxSpellRadius; y++) {
 				for (int z = -(int)maxSpellRadius; z < maxSpellRadius; z++) {
 					if (x % EIDOS_SPACING_HORIZONTAL == 0 && z % EIDOS_SPACING_HORIZONTAL == 0 && y % EIDOS_SPACING_VERTICAL == 0) {
-						anchors.add(new BlockPos(center.getX() + x, center.getY() + y, center.getZ() + z));
+						anchors.enqueue(new BlockPos(center.getX() + x, center.getY() + y, center.getZ() + z));
 					}
 				}
 			}
@@ -82,38 +80,31 @@ public class Spell {
 	public void tick() {
 		ticksLeft--;
 		if (ticksLeft < 0) return;
-		if (!sv.user.isAlive() || sv.user.isRemoved() || !SpiritVector.hasEquipped(sv.user)) {
+		if (!sv.user.isAlive() || sv.user.isRemoved() || !SpiritVector.hasEquipped(sv.user) || anchors.isEmpty()) {
 			ticksLeft = 0;
 			return;
 		}
+		
 		spellRadius++;
-		if (spellRadius > maxSpellRadius) return;
+		// creates an octahedron
+		if (sv.is(VectorType.BURST) && spellRadius > maxSpellRadius) return;
 
-		List<BlockPos> check = List.copyOf(anchors);
-		for (BlockPos bp : check) {
-			if (bp.isWithinDistance(this.center, spellRadius)) {
-				this.anchors.remove(bp);
-				Direction d = Direction.byId((bp.getX() + bp.getY() * 2 + bp.getZ() * 3) % 4 + 2);
-				this.core.emplace(sv.user.getWorld(), bp, d, decay);
-			}
+		int EIDOS_PER_TICK = 40;
+		for (int i = 0; i < EIDOS_PER_TICK; i++) {
+			if (anchors.isEmpty()) break;
+			BlockPos bp = anchors.dequeue();
+			// creates a sphere
+			if (sv.is(VectorType.DREAM) && !bp.isWithinDistance(this.center, maxSpellRadius)) break;
+			Direction d = Direction.byId((bp.getX() + bp.getY() * 2 + bp.getZ() * 3) % 4 + 2);
+			this.core.emplace(sv.user.getWorld(), bp, d, decay);
+
+			this.placementCallback.accept(bp);
 		}
-//
-//		BlockPos.Mutable bp = new BlockPos.Mutable();
-//		for (int x = -(int)spellRadius; x < spellRadius; x++) {
-//			for (int y = -(int)spellRadius; y < spellRadius; y++) {
-//				for (int z = -(int)spellRadius; z < spellRadius; z++) {
-//					// only update shell
-//					if (Math.abs(x) < spellRadius - 4 || Math.abs(y) < spellRadius - 4 || Math.abs(z) < spellRadius - 4) continue;
-//					if (x % EIDOS_SPACING_HORIZONTAL == 0 && z % EIDOS_SPACING_HORIZONTAL == 0 && y % EIDOS_SPACING_VERTICAL == 0) {
-//						Direction d = Direction.byId((x + y * 2 + z * 3) % 4 + 2);
-//						bp.set(ppos.getX() + x, ppos.getY() + y, ppos.getZ() + z);
-//						this.core.emplace(sv.user.getWorld(), bp, d, decay);
-//					}
-//				}
-//			}
-//		}
 
+	}
 
+	public void setPlacementCallback(Consumer<BlockPos> bc) {
+		this.placementCallback = bc;
 	}
 
 	public int ticksLeft() {

@@ -23,6 +23,7 @@ import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
+import symbolics.division.spirit_vector.render.SpellDimensionRenderer;
 import symbolics.division.spirit_vector.render.SpiritGaugeHUD;
 import symbolics.division.spirit_vector.render.SpiritVectorSkatesRenderer;
 import symbolics.division.spirit_vector.render.SpiritWingsFeatureRenderer;
@@ -96,6 +97,7 @@ public class SpiritVectorClient implements ClientModInitializer {
 
 		HandledScreens.register(RuneMatrixScreenHandler.RUNE_MATRIX,  RuneMatrixScreen::new);
 
+		SpellDimension.setSpellCallback(SpellDimensionRenderer.SDR::configureSpell);
 		ClientTickEvents.START_WORLD_TICK.register(world -> SpellDimension.worldTick());
 
 		BlockRenderLayerMap.INSTANCE.putBlock(SpiritVectorBlocks.MATERIA, RenderLayer.getTranslucent());

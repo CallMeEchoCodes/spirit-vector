@@ -59,7 +59,7 @@ public class SlideMovement extends NeutralMovement {
         if (sv.user.age % 10 == 0) {
             if (WaterRunAbility.isWaterRunning(sv)) {
                 sv.modifyMomentum(-1);
-            } else if (sv.getType().equals(VectorType.DREAM) && sv.horizontalSpeed() > DreamVector.MOMENTUM_GAIN_SPEED) {
+            } else if (sv.is(VectorType.DREAM) && sv.horizontalSpeed() > DreamVector.MOMENTUM_GAIN_SPEED) {
                 sv.modifyMomentum(DreamVector.MOMENTUM_GAIN_PER_SECOND / 2);
                 sv.stateManager().enableStateFor(SpiritVector.MOMENTUM_DECAY_GRACE_STATE, 10);
             }

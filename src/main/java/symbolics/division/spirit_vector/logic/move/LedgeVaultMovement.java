@@ -50,7 +50,7 @@ public class LedgeVaultMovement extends AbstractMovementType {
             result = ctx.inputDir().withAxis(Direction.Axis.Y, Math.max(0.3, y)).normalize();
         }
 
-		if (!vault && sv.getType().equals(VectorType.BURST)) {
+		if (!vault && sv.is(VectorType.BURST)) {
 			// burst always has fixed velocity change, for precision
 			sv.user.setVelocity(result.multiply(VAULT_SPEED *  sv.consumeSpeedMultiplier()));
 		} else {
@@ -63,7 +63,7 @@ public class LedgeVaultMovement extends AbstractMovementType {
 
     @Override
     public void updateValues(SpiritVector sv) {
-        if (!sv.getType().equals(VectorType.DREAM)) {
+        if (!sv.is(VectorType.DREAM)) {
             sv.modifyMomentum(MOMENTUM_GAINED);
             sv.stateManager().enableStateFor(SpiritVector.MOMENTUM_DECAY_GRACE_STATE, 20);
         }

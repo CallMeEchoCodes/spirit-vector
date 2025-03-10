@@ -1,13 +1,17 @@
 package symbolics.division.spirit_vector.mixin.client;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
@@ -17,12 +21,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.spell.SpellDimension;
+import symbolics.division.spirit_vector.render.SpellDimensionRenderer;
 import symbolics.division.spirit_vector.sfx.ClientSFX;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
 	private boolean shouldCancel() {
 		return SpellDimension.SPELL_DIMENSION.isCasting();
+	}
+
+	@WrapWithCondition(
+		method = "render",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/debug/DebugRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;DDD)V")
+	) public boolean wrapDebugRender(DebugRenderer instance, MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ) {
+		SpellDimensionRenderer.SDR.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
+		return true;
 	}
 
     @WrapOperation(

@@ -1,9 +1,8 @@
 package symbolics.division.spirit_vector.logic.spell;
 
-import symbolics.division.spirit_vector.logic.input.Arrow;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class SpellDimension {
 	// SpellDimension instance lasts for the length of a spell
@@ -12,15 +11,22 @@ public class SpellDimension {
 
 	public static final SpellDimension SPELL_DIMENSION = new SpellDimension();
 
+	private static Consumer<Spell> spellCallback = s -> {};
+
+	public static void setSpellCallback(Consumer<Spell> spellConsumer) {
+		spellCallback = spellConsumer;
+	}
+
 	public static void cast(Spell spell) {
 		SPELL_DIMENSION.activeSpells.add(spell);
+		spellCallback.accept(spell);
 	}
 
 	public static void worldTick() {
 		SPELL_DIMENSION.tick();
 	}
 
-	private List<Spell> activeSpells = new ArrayList<>();
+	private final List<Spell> activeSpells = new ArrayList<>();
 
 	public void tick() {
 		List<Spell> toTick = List.copyOf(activeSpells);
@@ -35,5 +41,9 @@ public class SpellDimension {
 
 	public boolean isCasting() {
 		return !activeSpells.isEmpty();
+	}
+
+	public List<Spell> activeSpells() {
+		return List.copyOf(activeSpells);
 	}
 }

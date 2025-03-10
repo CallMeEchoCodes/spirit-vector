@@ -31,7 +31,9 @@ public record Eidos(Set<Vector3fc> core, float size) {
 				anchor.getY() + p.y() - 3,
 				anchor.getZ() + zx.x()
 			);
-			world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState());
+			if (world.isAir(pos)) {
+				world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState());
+			}
 		}
 	}
 }

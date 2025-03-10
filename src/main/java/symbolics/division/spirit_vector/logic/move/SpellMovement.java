@@ -34,10 +34,12 @@ public class SpellMovement extends NeutralMovement {
 		InputManager input = sv.inputManager();
 		if (
 			!sv.user.isOnGround() &&
+			sv.getMomentum() >= SpiritVector.MAX_MOMENTUM * 0.9 &&
 			input.pressed(Input.CROUCH) &&
 			input.pressed(Input.SPRINT) &&
 			input.pressed(Input.JUMP)
 		) {
+			sv.setMomentum(0);
 			input.consume(Input.CROUCH);
 			input.consume(Input.SPRINT);
 			input.consume(Input.JUMP);

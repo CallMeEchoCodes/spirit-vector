@@ -202,12 +202,12 @@ public class SpiritVector {
     }
 
     public int getMomentum() {
-//        return MAX_MOMENTUM;
-        return momentum;
+        return MAX_MOMENTUM;
+//        return momentum;
     }
 
     public void modifyMomentum(int v) {
-        momentum = Math.clamp(momentum + v, 0, MAX_MOMENTUM);
+		setMomentum(momentum + v);
     }
     public boolean modifyMomentumWithCooldown(int v, int cdTicks) {
         if (!stateManager().isActive(MODIFY_MOMENTUM_COOLDOWN_STATE)) {
@@ -218,11 +218,18 @@ public class SpiritVector {
         return false;
     }
 
+	public void setMomentum(int v) {
+		momentum = Math.clamp(v, 0, MAX_MOMENTUM);
+	}
+
     public SFXPack<?> getSFX() {
         return sfx;
     }
 
     public VectorType getType() { return type; }
+	public boolean is(VectorType type) {
+		return getType().equals(type);
+	}
 
     public boolean isSoaring() {
         // it means you're really cool

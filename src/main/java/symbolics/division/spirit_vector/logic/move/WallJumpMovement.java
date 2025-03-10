@@ -114,7 +114,7 @@ public class WallJumpMovement extends AbstractMovementType {
             motion = motion.multiply(sv.consumeSpeedMultiplier());
         }
 
-        if (sv.getType().equals(VectorType.DREAM)) {
+        if (sv.is(VectorType.DREAM)) {
             sv.user.addVelocity(motion);
         } else {
             sv.user.setVelocity(motion);
@@ -128,7 +128,7 @@ public class WallJumpMovement extends AbstractMovementType {
 
     @Override
     public void updateValues(SpiritVector sv) {
-        if (!sv.getType().equals(VectorType.DREAM)) {
+        if (!sv.is(VectorType.DREAM)) {
             sv.modifyMomentum(MOMENTUM_GAINED);
             sv.stateManager().enableStateFor(SpiritVector.MOMENTUM_DECAY_GRACE_STATE, 20);
         }

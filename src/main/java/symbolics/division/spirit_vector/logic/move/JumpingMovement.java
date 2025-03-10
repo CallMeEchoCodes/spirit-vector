@@ -35,9 +35,9 @@ public class JumpingMovement extends NeutralMovement {
 
 		if (sv.inputManager().rawInput(Input.SPRINT)) {
 			Vec3d kickoff  = ctx.inputDir().multiply(0.3f);
-			float bounce = sv.getType().equals(VectorType.BURST) ? 0.3f : 0;
+			float bounce = sv.is(VectorType.BURST) ? 0.3f : 0;
 			sv.user.addVelocity(kickoff.x, bounce, kickoff.z);
-			if (!sv.getType().equals(VectorType.SPIRIT)) {
+			if (!sv.is(VectorType.SPIRIT)) {
 				sv.modifyMomentum(-sv.getMomentum());
 			}
 			sv.effectsManager().kickoff(sv.user.getPos());

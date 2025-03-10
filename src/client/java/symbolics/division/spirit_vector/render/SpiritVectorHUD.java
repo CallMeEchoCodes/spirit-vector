@@ -124,6 +124,7 @@ public class SpiritVectorHUD {
 
 	}
 
+	private static final int[] ticksArrowsVisible = new int[Spell.MAX_CODE_LENGTH];
 	public static void renderEigenCode(DrawContext context) {
 		PlayerEntity player = MinecraftClient.getInstance().player;
 		if (player != null
@@ -132,36 +133,114 @@ public class SpiritVectorHUD {
 			SpiritVector sv = user.spiritVector();
 			if (sv == null) return;
 			List<Arrow> eigenCode = SpellMovement.getCurrentEigenCode(sv);
-			float sep = 1 / (float)Spell.MAX_CODE_LENGTH * 4 * MathHelper.PI;
-
-			int cx = context.getScaledWindowWidth() / 2;
-			int cy = context.getScaledWindowHeight() / 2;
 
 			int offx = 8;
 			int offy = 8;
 
-			for (int i = 0; i < eigenCode.size(); i++) {
-				Arrow arrow = eigenCode.get(i);
-				float theta = sep * i;
-				if (i >= Spell.MAX_CODE_LENGTH / 2) {
-					theta += sep / 2;
+			boolean ddr = true;
+
+			if (ddr) {
+				int DANCE_WIDTH = 200;
+				int mid = context.getScaledWindowWidth() / 2;
+				int topAnchor = context.getScaledWindowHeight() + offy;
+				int leftAnchor = mid - DANCE_WIDTH / 2;
+				int danceSep = DANCE_WIDTH / 3;
+
+				for (int i = 0; i < ticksArrowsVisible.length; i++) {
+					if (i >= eigenCode.size()) {
+						ticksArrowsVisible[i] = 0;
+						continue;
+					}
+					ticksArrowsVisible[i]++;
+					Arrow arrow = eigenCode.get(i);
+//					int left = arrow.ordinal() < 2 ? arrow.ordinal() - 2 : arrow.ordinal() + 1;
+					int left = arrow.ordinal() * danceSep;
+
+					int x = leftAnchor + left - offx; //mid + left * sep + offx;
+					int y = topAnchor - ticksArrowsVisible[i] * 4 - offy;
+
+					SpiritVectorHUD.drawTexture(
+						context.getMatrices(),
+						SpiritVectorMod.id("textures/gui/spell_input_" + arrow.id + ".png"),
+						x, y,
+						0, 0,
+						16, 16,
+						16, 16,
+						1, 1, 1,1
+					);
 				}
+			} else {
+				float sep = 1 / (float)Spell.MAX_CODE_LENGTH * 4 * MathHelper.PI;
 
-				int y = (int)(MathHelper.sin(theta) * 100);
-				int x = (int)(MathHelper.cos(theta) * 100);
+				int cx = context.getScaledWindowWidth() / 2;
+				int cy = context.getScaledWindowHeight() / 2;
 
-				SpiritVectorHUD.drawTexture(
-					context.getMatrices(),
-					SpiritVectorMod.id("textures/gui/spell_input_" + arrow.id + ".png"),
-					cx + x - offx, cy + y - offy,
-					0, 0,
-					16, 16,
-					16, 16,
-					1, 1, 1,1
-				);
+				for (int i = 0; i < eigenCode.size(); i++) {
+					Arrow arrow = eigenCode.get(i);
+
+					// CIRCLE
+					float theta = sep * i;
+					if (i >= Spell.MAX_CODE_LENGTH / 2) {
+						theta += sep / 2;
+					}
+
+					int y = (int)(MathHelper.sin(theta) * 100);
+					int x = (int)(MathHelper.cos(theta) * 100);
+
+					SpiritVectorHUD.drawTexture(
+						context.getMatrices(),
+						SpiritVectorMod.id("textures/gui/spell_input_" + arrow.id + ".png"),
+						cx + x - offx, cy + y - offy,
+						0, 0,
+						16, 16,
+						16, 16,
+						1, 1, 1,1
+					);
+				}
 			}
 		}
 	}
+
+//	public static void renderEigenCode(DrawContext context) {
+//		PlayerEntity player = MinecraftClient.getInstance().player;
+//		if (player != null
+//			&& player.isAlive()
+//			&& player instanceof ISpiritVectorUser user) {
+//			SpiritVector sv = user.spiritVector();
+//			if (sv == null) return;
+//			List<Arrow> eigenCode = SpellMovement.getCurrentEigenCode(sv);
+//			float sep = 1 / (float)Spell.MAX_CODE_LENGTH * 4 * MathHelper.PI;
+//
+//			int cx = context.getScaledWindowWidth() / 2;
+//			int cy = context.getScaledWindowHeight() / 2;
+//
+//			int offx = 8;
+//			int offy = 8;
+//
+//			for (int i = 0; i < eigenCode.size(); i++) {
+//				Arrow arrow = eigenCode.get(i);
+//
+//				// CIRCLE
+//				float theta = sep * i;
+//				if (i >= Spell.MAX_CODE_LENGTH / 2) {
+//					theta += sep / 2;
+//				}
+//
+//				int y = (int)(MathHelper.sin(theta) * 100);
+//				int x = (int)(MathHelper.cos(theta) * 100);
+//
+//				SpiritVectorHUD.drawTexture(
+//					context.getMatrices(),
+//					SpiritVectorMod.id("textures/gui/spell_input_" + arrow.id + ".png"),
+//					cx + x - offx, cy + y - offy,
+//					0, 0,
+//					16, 16,
+//					16, 16,
+//					1, 1, 1,1
+//				);
+//			}
+//		}
+//	}
 
 	public static void drawTexture(MatrixStack matrices, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float r, float g, float b, float a) {
 		int x2 = x + width;
