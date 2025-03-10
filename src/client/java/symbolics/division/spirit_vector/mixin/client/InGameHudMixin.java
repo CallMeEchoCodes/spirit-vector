@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,5 +43,12 @@ public class InGameHudMixin {
 		at = @At("HEAD")
 	) public void renderSoaringWings(DrawContext context, CallbackInfo ci) {
 		SpiritVectorHUD.renderSoaring(context);
+	}
+
+	@Inject(
+		method = "renderHotbar",
+		at = @At("HEAD")
+	) public void renderEigenCode(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+		SpiritVectorHUD.renderEigenCode(context);
 	}
 }

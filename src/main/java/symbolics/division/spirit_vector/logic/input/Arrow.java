@@ -3,15 +3,16 @@ package symbolics.division.spirit_vector.logic.input;
 import net.minecraft.util.math.MathHelper;
 
 public enum Arrow {
-	DOWN("key.down", "↓"),
-	RIGHT("key.right", "→"),
-	UP("key.up", "↑"),
-	LEFT("key.left", "←");
+	DOWN("key.down", "↓", "down"),
+	RIGHT("key.right", "→", "right"),
+	UP("key.up", "↑", "up"),
+	LEFT("key.left", "←", "left");
 
 	public final String key;
 	public final String sym;
-	Arrow(String key, String sym) {
-		this.key = key; this.sym = sym;
+	public final String id;
+	Arrow(String key, String sym, String id) {
+		this.key = key; this.sym = sym; this.id = id;
 	}
 
 	public Arrow leftNeighbor() {

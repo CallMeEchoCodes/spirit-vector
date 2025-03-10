@@ -10,6 +10,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +18,12 @@ import org.joml.Matrix4f;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
+import symbolics.division.spirit_vector.logic.input.Arrow;
+import symbolics.division.spirit_vector.logic.move.SpellMovement;
+import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
+
+import java.util.List;
 
 public class SpiritVectorHUD {
 
@@ -28,6 +34,11 @@ public class SpiritVectorHUD {
 	public static final Identifier SLOT_LEFT = SpiritVectorMod.id("textures/gui/slot_indicator_left.png");
 	public static final Identifier SLOT_UP = SpiritVectorMod.id("textures/gui/slot_indicator_up.png");
 	public static final Identifier SLOT_RIGHT = SpiritVectorMod.id("textures/gui/slot_indicator_right.png");
+
+	public static final Identifier SPELL_RIGHT = SpiritVectorMod.id("textures/gui/spell_input_right.png");
+	public static final Identifier SPELL_UP = SpiritVectorMod.id("textures/gui/spell_input_up.png");
+	public static final Identifier SPELL_LEFT = SpiritVectorMod.id("textures/gui/spell_input_left.png");
+	public static final Identifier SPELL_DOWN = SpiritVectorMod.id("textures/gui/spell_input_down.png");
 
 	@Nullable
 	public static SpiritVector getSpiritVector() {
@@ -111,6 +122,45 @@ public class SpiritVectorHUD {
 			}
 		}
 
+	}
+
+	public static void renderEigenCode(DrawContext context) {
+		PlayerEntity player = MinecraftClient.getInstance().player;
+		if (player != null
+			&& player.isAlive()
+			&& player instanceof ISpiritVectorUser user) {
+			SpiritVector sv = user.spiritVector();
+			if (sv == null) return;
+			List<Arrow> eigenCode = SpellMovement.getCurrentEigenCode(sv);
+			float sep = 1 / (float)Spell.MAX_CODE_LENGTH * 4 * MathHelper.PI;
+
+			int cx = context.getScaledWindowWidth() / 2;
+			int cy = context.getScaledWindowHeight() / 2;
+
+			int offx = 8;
+			int offy = 8;
+
+			for (int i = 0; i < eigenCode.size(); i++) {
+				Arrow arrow = eigenCode.get(i);
+				float theta = sep * i;
+				if (i >= Spell.MAX_CODE_LENGTH / 2) {
+					theta += sep / 2;
+				}
+
+				int y = (int)(MathHelper.sin(theta) * 100);
+				int x = (int)(MathHelper.cos(theta) * 100);
+
+				SpiritVectorHUD.drawTexture(
+					context.getMatrices(),
+					SpiritVectorMod.id("textures/gui/spell_input_" + arrow.id + ".png"),
+					cx + x - offx, cy + y - offy,
+					0, 0,
+					16, 16,
+					16, 16,
+					1, 1, 1,1
+				);
+			}
+		}
 	}
 
 	public static void drawTexture(MatrixStack matrices, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float r, float g, float b, float a) {

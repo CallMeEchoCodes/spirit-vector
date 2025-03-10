@@ -60,6 +60,7 @@ public class SpellMovement extends NeutralMovement {
 		sv.user.setVelocity(
 			MovementUtils.augmentedInput(sv, ctx).multiply(0.6).add(0, 0.5, 0)
 		);
+		((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
 	}
 
 	@Override
@@ -70,6 +71,10 @@ public class SpellMovement extends NeutralMovement {
 		}
 		SlideMovement.travelWithInput(sv, Vec3d.ZERO);
 		ctx.ci().cancel();
+	}
+
+	public static List<Arrow> getCurrentEigenCode(SpiritVector sv) {
+		return List.copyOf(((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).eigenCode());
 	}
 
 	private static class SpellcastingState extends ManagedState {
