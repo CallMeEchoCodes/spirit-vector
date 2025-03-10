@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.sfx.sound.EngineSoundInstance;
 import symbolics.division.spirit_vector.sfx.sound.SlidingSoundInstance;
+import symbolics.division.spirit_vector.sfx.sound.SpellDimensionSoundInstance;
 
 @Mixin(AbstractClientPlayerEntity.class)
 public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity {
@@ -21,6 +23,7 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity {
 
     private EngineSoundInstance engineSound;
     private SlidingSoundInstance slidingSound;
+	private SpellDimensionSoundInstance spellSound;
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
         if (slidingSound == null) {
@@ -40,5 +43,14 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity {
         } else if (engineSound.isDone()) {
             engineSound = null;
         }
+
+		if (spellSound == null) {
+			if (SpellDimensionSoundInstance.shouldPlayFor((AbstractClientPlayerEntity) (PlayerEntity) this)) {
+				spellSound = new SpellDimensionSoundInstance(this);
+				MinecraftClient.getInstance().getSoundManager().play(spellSound);
+			}
+		} else if (spellSound.isDone() || spellSound.getVolume() == 0.0) {
+			spellSound = null;
+		}
     }
 }

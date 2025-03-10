@@ -10,6 +10,7 @@ import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.spell.SpellDimension;
+import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
@@ -104,7 +105,10 @@ public class SpellMovement extends NeutralMovement {
 					eigenCode.add(Arrow.LEFT);
 				} else if (arrows.consume(Arrow.RIGHT)) {
 					eigenCode.add(Arrow.RIGHT);
+				} else {
+					return;
 				}
+				SpellFXEvents.arrowInput();
 			}
 		}
 

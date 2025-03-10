@@ -11,6 +11,7 @@ import net.minecraft.util.Identifier;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
+import symbolics.division.spirit_vector.render.SpiritVectorHUD;
 
 public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 	private static final Identifier TEXTURE = SpiritVectorMod.id("textures/gui/container/rune_matrix.png");
@@ -46,10 +47,7 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 			this.modeSprite = getModeSprite();
 		}
 		context.drawGuiTexture(this.modeSprite, this.x + MODE_SLOT_LEFT_OFFSET, this.y+MODE_SLOT_TOP_OFFSET, 16, 16);
-//		context.drawTexture(this.modeSprite, this.x + MODE_SLOT_LEFT_OFFSET, this.y+MODE_SLOT_TOP_OFFSET, 0, 0, this.backgroundWidth,  this.backgroundHeight);
 
-		int slotLeftOffset = 56;
-		int slotTopOffset = 7;
 		renderSlotInset(context, this.handler.leftSlot, 0, 0);
 		renderSlotInset(context, this.handler.upSlot, 25, -25);
 		renderSlotInset(context, this.handler.rightSlot, 50, 0);
@@ -67,7 +65,7 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 		int y1 = MODE_SLOT_TOP_OFFSET + this.y;
 		int y2 = y1 + 16;
 		if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SpiritVectorSounds.RUNE_MATRIX_CLICK, 1.0F));
+			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_CLICK, 1);
 			this.client.interactionManager.clickButton(this.handler.syncId, 1);
 		}
 		return super.mouseClicked(mouseX, mouseY, button);

@@ -9,16 +9,21 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import symbolics.division.spirit_vector.SpiritVectorMod;
+import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 import symbolics.division.spirit_vector.logic.input.Arrow;
+import symbolics.division.spirit_vector.logic.move.MovementType;
 import symbolics.division.spirit_vector.logic.move.SpellMovement;
 import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
@@ -133,6 +138,7 @@ public class SpiritVectorHUD {
 			SpiritVector sv = user.spiritVector();
 			if (sv == null) return;
 			List<Arrow> eigenCode = SpellMovement.getCurrentEigenCode(sv);
+			if (!sv.getMoveState().equals(MovementType.SPELL)) return;
 
 			int offx = 8;
 			int offy = 8;
@@ -142,9 +148,25 @@ public class SpiritVectorHUD {
 			if (ddr) {
 				int DANCE_WIDTH = 200;
 				int mid = context.getScaledWindowWidth() / 2;
-				int topAnchor = context.getScaledWindowHeight() + offy;
+				int topAnchor = context.getScaledWindowHeight()/2 + 25;
 				int leftAnchor = mid - DANCE_WIDTH / 2;
 				int danceSep = DANCE_WIDTH / 3;
+
+				for (Arrow dir : Arrow.values()) {
+					int left = dir.ordinal() * danceSep;
+					int x = leftAnchor + left - offx;
+					int y = topAnchor - offy;
+
+					SpiritVectorHUD.drawTexture(
+						context.getMatrices(),
+						SpiritVectorMod.id("textures/gui/spell_input_outline_" + dir.id + ".png"),
+						x, y,
+						0, 0,
+						16, 16,
+						16, 16,
+						1, 1, 1,1
+					);
+				}
 
 				for (int i = 0; i < ticksArrowsVisible.length; i++) {
 					if (i >= eigenCode.size()) {
@@ -153,7 +175,6 @@ public class SpiritVectorHUD {
 					}
 					ticksArrowsVisible[i]++;
 					Arrow arrow = eigenCode.get(i);
-//					int left = arrow.ordinal() < 2 ? arrow.ordinal() - 2 : arrow.ordinal() + 1;
 					int left = arrow.ordinal() * danceSep;
 
 					int x = leftAnchor + left - offx; //mid + left * sep + offx;
@@ -201,47 +222,6 @@ public class SpiritVectorHUD {
 		}
 	}
 
-//	public static void renderEigenCode(DrawContext context) {
-//		PlayerEntity player = MinecraftClient.getInstance().player;
-//		if (player != null
-//			&& player.isAlive()
-//			&& player instanceof ISpiritVectorUser user) {
-//			SpiritVector sv = user.spiritVector();
-//			if (sv == null) return;
-//			List<Arrow> eigenCode = SpellMovement.getCurrentEigenCode(sv);
-//			float sep = 1 / (float)Spell.MAX_CODE_LENGTH * 4 * MathHelper.PI;
-//
-//			int cx = context.getScaledWindowWidth() / 2;
-//			int cy = context.getScaledWindowHeight() / 2;
-//
-//			int offx = 8;
-//			int offy = 8;
-//
-//			for (int i = 0; i < eigenCode.size(); i++) {
-//				Arrow arrow = eigenCode.get(i);
-//
-//				// CIRCLE
-//				float theta = sep * i;
-//				if (i >= Spell.MAX_CODE_LENGTH / 2) {
-//					theta += sep / 2;
-//				}
-//
-//				int y = (int)(MathHelper.sin(theta) * 100);
-//				int x = (int)(MathHelper.cos(theta) * 100);
-//
-//				SpiritVectorHUD.drawTexture(
-//					context.getMatrices(),
-//					SpiritVectorMod.id("textures/gui/spell_input_" + arrow.id + ".png"),
-//					cx + x - offx, cy + y - offy,
-//					0, 0,
-//					16, 16,
-//					16, 16,
-//					1, 1, 1,1
-//				);
-//			}
-//		}
-//	}
-
 	public static void drawTexture(MatrixStack matrices, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float r, float g, float b, float a) {
 		int x2 = x + width;
 		int y2 = y + height;
@@ -260,5 +240,9 @@ public class SpiritVectorHUD {
 		bufferBuilder.vertex(matrix4f, (float)x2, (float)y1, (float)z).texture(u2, v1).color(red, green, blue, alpha);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		RenderSystem.disableBlend();
+	}
+
+	public static void playUISound(SoundEvent sound, float pitch) {
+		MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(sound, pitch));
 	}
 }

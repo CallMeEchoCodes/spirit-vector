@@ -3,6 +3,9 @@ package symbolics.division.spirit_vector.logic.spell;
 import it.unimi.dsi.fastutil.objects.ObjectArrayPriorityQueue;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import it.unimi.dsi.fastutil.PriorityQueue;
@@ -11,12 +14,12 @@ import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
 
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Spell {
@@ -52,10 +55,10 @@ public class Spell {
 
 		this.maxSpellRadius = (int)(MIN_SPELL_DIMENSION_RADIUS + (MAX_SPELL_DIMENSION_RADIUS - MIN_SPELL_DIMENSION_RADIUS) * complexity);
 		this.ticksLeft = (int)(MIN_SPELL_TICKS + (MAX_SPELL_TICKS - MIN_SPELL_TICKS) * complexity);
-		SpiritVectorMod.LOGGER.info("casting spell: " + code);
-		SpiritVectorMod.LOGGER.info("radius: " + this.maxSpellRadius);
-		SpiritVectorMod.LOGGER.info("complexity: " + complexity);
-		SpiritVectorMod.LOGGER.info("decay: " + decay);
+		SpiritVectorMod.LOGGER.debug("casting spell: " + code);
+		SpiritVectorMod.LOGGER.debug("radius: " + this.maxSpellRadius);
+		SpiritVectorMod.LOGGER.debug("complexity: " + complexity);
+		SpiritVectorMod.LOGGER.debug("decay: " + decay);
 
 		this.center = sv.user.getBlockPos();
 
@@ -75,22 +78,27 @@ public class Spell {
 				}
 			}
 		}
+
+		SpellFXEvents.openSpellDimension();
 	}
 
-	public void tick() {
-		ticksLeft--;
-		if (ticksLeft < 0) return;
-		if (!sv.user.isAlive() || sv.user.isRemoved() || !SpiritVector.hasEquipped(sv.user) || anchors.isEmpty()) {
+	public void tick(SpellDimension spellDimension) {
+		if (!sv.user.isAlive() ||
+			sv.user.isRemoved() ||
+			!SpiritVector.hasEquipped(sv.user)
+		) {
 			ticksLeft = 0;
 			return;
 		}
+
+		ticksLeft--;
+		if (ticksLeft < 0 || anchors.isEmpty()) return;
 		
 		spellRadius++;
 		// creates an octahedron
 		if (sv.is(VectorType.BURST) && spellRadius > maxSpellRadius) return;
 
-		int EIDOS_PER_TICK = 40;
-		for (int i = 0; i < EIDOS_PER_TICK; i++) {
+		for (int i = 0; i < SpellDimension.EIDOS_PER_TICK; i++) {
 			if (anchors.isEmpty()) break;
 			BlockPos bp = anchors.dequeue();
 			// creates a sphere
@@ -98,9 +106,10 @@ public class Spell {
 			Direction d = Direction.byId((bp.getX() + bp.getY() * 2 + bp.getZ() * 3) % 4 + 2);
 			this.core.emplace(sv.user.getWorld(), bp, d, decay);
 
+			// merge these
 			this.placementCallback.accept(bp);
+			spellDimension.eidosPlaced(sv.user.getWorld(), bp, MathHelper.ceil(this.core.size()) + 2, this.ticksLeft);
 		}
-
 	}
 
 	public void setPlacementCallback(Consumer<BlockPos> bc) {
