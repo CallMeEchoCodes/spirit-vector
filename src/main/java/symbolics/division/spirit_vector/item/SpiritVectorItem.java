@@ -86,10 +86,6 @@ public class SpiritVectorItem extends ArmorItem {
         if (user.isSneaking()) {
 			user.openHandledScreen(createScreenHandlerFactory(world, user.getBlockPos()));
             ItemStack stack = user.getStackInHand(hand);
-//            VectorType type = stack.getOrDefault(VectorType.COMPONENT, RegistryEntry.of(VectorType.SPIRIT)).value();
-//            int nextIndex = (VectorType.REGISTRY.getRawId(type) + 1) % VectorType.REGISTRY.size();
-//            stack.set(VectorType.COMPONENT, VectorType.REGISTRY.getEntry(nextIndex).orElseThrow());
-//            world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.PLAYERS, 1, 1);
             return TypedActionResult.success(stack);
         }
         return super.use(world, user, hand);
@@ -100,7 +96,6 @@ public class SpiritVectorItem extends ArmorItem {
 		return new SimpleNamedScreenHandlerFactory(
 			(syncId, playerInventory, player) -> new RuneMatrixScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos)),
 			RUNE_MATRIX_GUI_TITLE
-//			(syncId, playerInventory, player) -> new StonecutterScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos)), TITLE
 		);
 	}
 }

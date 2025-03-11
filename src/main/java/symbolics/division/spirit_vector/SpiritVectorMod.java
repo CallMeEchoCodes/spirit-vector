@@ -3,6 +3,8 @@ package symbolics.division.spirit_vector;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,7 +19,9 @@ import symbolics.division.spirit_vector.compat.ModCompatibility;
 import symbolics.division.spirit_vector.logic.SVEntityState;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
+import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
+import symbolics.division.spirit_vector.networking.PhysicalizeMateriaPayloadC2S;
 import symbolics.division.spirit_vector.registry.SpiritVectorRegistration;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXRequestPayload;
@@ -51,6 +55,12 @@ public final class SpiritVectorMod implements ModInitializer {
 		PayloadTypeRegistry.playC2S().register(SVEntityState.Payload.ID, SVEntityState.Payload.CODEC);
 		PayloadTypeRegistry.playS2C().register(SVEntityState.Payload.ID, SVEntityState.Payload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(SVEntityState.Payload.ID, SVEntityState::handleStateSyncC2S);
+
+		PayloadTypeRegistry.playC2S().register(PhysicalizeMateriaPayloadC2S.ID, PhysicalizeMateriaPayloadC2S.CODEC);
+		PayloadTypeRegistry.playS2C().register(PhysicalizeMateriaPayloadC2S.ID, PhysicalizeMateriaPayloadC2S.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(PhysicalizeMateriaPayloadC2S.ID, PhysicalizeMateriaPayloadC2S::HANDLER);
+
+		ServerTickEvents.START_WORLD_TICK.register(SpellDimension::worldTick);
 
 		// hoping this covers all cases where players should be updated on wing state
 		// TODO doesn't seem to work, figure out during integration with larger sample size

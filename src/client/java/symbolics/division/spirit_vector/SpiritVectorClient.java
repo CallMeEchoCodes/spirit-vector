@@ -105,6 +105,8 @@ public class SpiritVectorClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(SpiritVectorBlocks.MATERIA, RenderLayer.getTranslucent());
 
 		SpellFXEvents.INSTANCE = new SpellFX();
+
+		ClientTickEvents.END_CLIENT_TICK.register(w -> MateriaPhysicalizer.tick());
 	}
 
 //	private <T extends CustomPayload>

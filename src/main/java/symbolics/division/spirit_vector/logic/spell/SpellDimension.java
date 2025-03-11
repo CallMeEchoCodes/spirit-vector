@@ -1,23 +1,14 @@
 package symbolics.division.spirit_vector.logic.spell;
 
 import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.PriorityQueue;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectHeapPriorityQueue;
+import net.minecraft.MinecraftVersion;
 import net.minecraft.block.Blocks;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.command.FillCommand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.DimensionTypes;
-import net.minecraft.world.explosion.Explosion;
 import symbolics.division.spirit_vector.SpiritVectorBlocks;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -49,12 +40,15 @@ public class SpellDimension {
 	private final Map<Pair<World, BlockPos>, EidosInfo> eidosTracker = new Object2ObjectLinkedOpenHashMap<>();
 
 	public void tick(World world) {
-		List<Spell> toTick = List.copyOf(activeSpells);
-		for (Spell spell : toTick) {
-			if (spell.ticksLeft() <= 0) {
-				activeSpells.remove(spell);
-			} else {
-				spell.tick(this);
+		// client side only in singleplayer
+		if (world.isClient) {
+			List<Spell> toTick = List.copyOf(activeSpells);
+			for (Spell spell : toTick) {
+				if (spell.ticksLeft() <= 0) {
+					activeSpells.remove(spell);
+				} else {
+					spell.tick(this);
+				}
 			}
 		}
 		this.cullEidos(world);
@@ -89,7 +83,7 @@ public class SpellDimension {
 					pos.getX() + info.size,
 					pos.getY() + info.size,
 					pos.getZ() + info.size)) {
-					if (world.getBlockState(blockPos).isOf(SpiritVectorBlocks.MATERIA)) {
+					if (SpiritVectorBlocks.Materia.removable(world.getBlockState(blockPos), !world.isClient)) {
 						world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
 					}
 				}
@@ -99,7 +93,15 @@ public class SpellDimension {
 	}
 
 	public boolean isCasting() {
-		return !activeSpells.isEmpty();
+		return !eidosTracker.isEmpty();
+	}
+
+	public int ticksLeft() {
+		int left = 0;
+		for (Spell spell : activeSpells) {
+			left = Math.max(spell.ticksLeft(), left);
+		}
+		return left;
 	}
 
 	private static class EidosInfo {

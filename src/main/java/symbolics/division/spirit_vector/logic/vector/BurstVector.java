@@ -14,4 +14,9 @@ public class BurstVector extends SpiritVector {
 	public void modifyMomentum(int v) {
 		super.modifyMomentum(v > 0 ? v * BURST_MOMENTUM_MULTIPLIER : v);
 	}
+
+	@Override
+	public float getMovementSpeed(float slip) {
+		return user.getMovementSpeed() * (0.21600002F / (slip * slip * slip));
+	}
 }

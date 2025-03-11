@@ -25,9 +25,7 @@ import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 import symbolics.division.spirit_vector.logic.ability.GroundPoundAbility;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbility;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorHeldAbilities;
-import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.input.ArrowManager;
-import symbolics.division.spirit_vector.logic.input.FeedbackManager;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.move.MovementType;
@@ -39,8 +37,6 @@ import symbolics.division.spirit_vector.logic.state.StateManager;
 import symbolics.division.spirit_vector.logic.state.WingsEffectState;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXPack;
-
-import java.util.Arrays;
 
 public class SpiritVector {
 
@@ -202,8 +198,8 @@ public class SpiritVector {
     }
 
     public int getMomentum() {
-        return MAX_MOMENTUM;
-//        return momentum;
+//        return MAX_MOMENTUM;
+        return momentum;
     }
 
     public void modifyMomentum(int v) {

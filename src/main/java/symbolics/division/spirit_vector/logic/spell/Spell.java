@@ -14,7 +14,6 @@ import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
 
-import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +118,6 @@ public class Spell {
 	public int ticksLeft() {
 		return ticksLeft;
 	}
-
 
 	private Eidos makeCore(List<Arrow> eigenCode) {
 		Map<Arrow, EidosEdge> edges = new TreeMap<>();
