@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
+import net.minecraft.network.packet.s2c.play.ExperienceBarUpdateS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import symbolics.division.spirit_vector.event.JukeboxEvent;
@@ -24,6 +25,7 @@ import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
+import symbolics.division.spirit_vector.networking.OpenRMConfigRequestPayloadC2S;
 import symbolics.division.spirit_vector.render.SpellDimensionRenderer;
 import symbolics.division.spirit_vector.render.SpellFX;
 import symbolics.division.spirit_vector.render.SpiritGaugeHUD;
@@ -107,6 +109,11 @@ public class SpiritVectorClient implements ClientModInitializer {
 		SpellFXEvents.INSTANCE = new SpellFX();
 
 		ClientTickEvents.END_CLIENT_TICK.register(w -> MateriaPhysicalizer.tick());
+
+		SpiritVector.configCallback = ()  -> {
+			ClientPlayNetworking.send(new OpenRMConfigRequestPayloadC2S());
+			ExperienceBarUpdateS2CPacket
+		};
 	}
 
 //	private <T extends CustomPayload>

@@ -1,6 +1,7 @@
 package symbolics.division.spirit_vector.screen;
 
 import net.minecraft.component.ComponentMap;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -10,14 +11,18 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.Property;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.item.DreamRuneItem;
@@ -41,7 +46,14 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 
 	public static void init() {}
 
-	private static class RuneSlot extends Slot {
+    public static NamedScreenHandlerFactory createScreenHandlerFactory(boolean wearing, World world, BlockPos pos) {
+		return new SimpleNamedScreenHandlerFactory(
+			(syncId, playerInventory, player) -> new RuneMatrixScreenHandler(wearing, syncId, playerInventory, ScreenHandlerContext.create(world, pos)),
+			SpiritVectorItem.RUNE_MATRIX_GUI_TITLE
+		);
+	}
+
+    private static class RuneSlot extends Slot {
 		public RuneSlot(Inventory inventory, int index, int x, int y) { super(inventory, index, x, y); }
 		@Override public boolean canInsert(ItemStack stack) {return stack.getItem() instanceof DreamRuneItem; }
 		@Override public boolean canBeHighlighted() { return false; }
@@ -62,14 +74,16 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 //	private ItemStack svItem = ItemStack.EMPTY;
 	private final Hand currentHand;
 	private final PlayerEntity player;
+	private final boolean wearing;
 
 	public RuneMatrixScreenHandler(int syncId, PlayerInventory playerInventory) {
-		this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
+		this(true, syncId, playerInventory, ScreenHandlerContext.EMPTY);
 	}
 
-	public RuneMatrixScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+	public RuneMatrixScreenHandler(boolean wearing, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
 		super(RUNE_MATRIX, syncId);
 		this.context = context;
+		this.wearing = wearing;
 		this.player = playerInventory.player;
 		if (player.getWorld().isClient) {
 			player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SpiritVectorSounds.RUNE_MATRIX_CLICK, SoundCategory.PLAYERS, 1.0f, 1);
@@ -223,11 +237,18 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	}
 
 	private ItemStack getTargetStack() {
+		if (wearing) {
+			return player.getEquippedStack(EquipmentSlot.FEET);
+		}
 		return player.getStackInHand(this.currentHand);
 	}
 
 	private void setTargetStack(ItemStack stack) {
-		player.setStackInHand(currentHand, stack);
+		if (wearing) {
+			player.equipStack(EquipmentSlot.FEET, stack);
+		} else {
+			player.setStackInHand(currentHand, stack);
+		}
 		player.getInventory().markDirty();
 	}
 }

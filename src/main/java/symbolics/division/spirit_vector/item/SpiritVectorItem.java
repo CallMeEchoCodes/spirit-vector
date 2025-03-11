@@ -1,31 +1,18 @@
 package symbolics.division.spirit_vector.item;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.WritableBookItem;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.AnvilScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.screen.StonecutterScreenHandler;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorHeldAbilities;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
@@ -84,18 +71,11 @@ public class SpiritVectorItem extends ArmorItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (user.isSneaking()) {
-			user.openHandledScreen(createScreenHandlerFactory(world, user.getBlockPos()));
+			user.openHandledScreen(RuneMatrixScreenHandler.createScreenHandlerFactory(false, world, user.getBlockPos()));
             ItemStack stack = user.getStackInHand(hand);
             return TypedActionResult.success(stack);
         }
         return super.use(world, user, hand);
     }
 
-	@Nullable
-	protected NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
-		return new SimpleNamedScreenHandlerFactory(
-			(syncId, playerInventory, player) -> new RuneMatrixScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos)),
-			RUNE_MATRIX_GUI_TITLE
-		);
-	}
 }

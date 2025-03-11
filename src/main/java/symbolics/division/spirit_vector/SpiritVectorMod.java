@@ -21,6 +21,7 @@ import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
 import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
+import symbolics.division.spirit_vector.networking.OpenRMConfigRequestPayloadC2S;
 import symbolics.division.spirit_vector.networking.PhysicalizeMateriaPayloadC2S;
 import symbolics.division.spirit_vector.registry.SpiritVectorRegistration;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
@@ -51,7 +52,8 @@ public final class SpiritVectorMod implements ModInitializer {
 		registerC2S(TeleportAbilityC2SPayload.ID, TeleportAbilityC2SPayload.CODEC, TeleportAbilityC2SPayload::HANDLER);
 		registerC2S(SlamPacketC2S.ID, SlamPacketC2S.CODEC, SlamPacketC2S::HANDLER);
 
-		// if this happens more often, may need a factory for generalizing this over record attachments
+		registerC2S(OpenRMConfigRequestPayloadC2S.ID, OpenRMConfigRequestPayloadC2S.CODEC, OpenRMConfigRequestPayloadC2S::HANDLER);
+
 		PayloadTypeRegistry.playC2S().register(SVEntityState.Payload.ID, SVEntityState.Payload.CODEC);
 		PayloadTypeRegistry.playS2C().register(SVEntityState.Payload.ID, SVEntityState.Payload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(SVEntityState.Payload.ID, SVEntityState::handleStateSyncC2S);

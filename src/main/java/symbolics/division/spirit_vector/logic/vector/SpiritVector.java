@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -38,6 +39,8 @@ import symbolics.division.spirit_vector.logic.state.WingsEffectState;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXPack;
 
+import java.util.Objects;
+
 public class SpiritVector {
 
     public static final int MAX_MOMENTUM = 100;
@@ -46,6 +49,8 @@ public class SpiritVector {
     public static final Identifier MOMENTUM_DECAY_GRACE_STATE = SpiritVectorMod.id("momentum_decay_grace");
 
     private static final Identifier MODIFY_MOMENTUM_COOLDOWN_STATE = SpiritVectorMod.id("momentum_cd_state");
+
+	public static Runnable configCallback = null;
 
     public static SpiritVector of(LivingEntity user, ItemStack itemStack) {
         return VectorType.getFromStack(itemStack).factory().make(user, itemStack);
@@ -67,6 +72,7 @@ public class SpiritVector {
     public final LivingEntity user;
 
     protected int momentum = 0;
+	protected int configTicks = 0;
     protected MovementType moveState = MovementType.NEUTRAL;
     protected SpiritVectorAbility queuedAbility; // hand rune input
     protected Vec3d inputDirection = Vec3d.ZERO;
@@ -121,6 +127,17 @@ public class SpiritVector {
         stateManager.tick();
         inputDirection = MovementUtils.movementInputToVelocity(movementInput, 1, user.getYaw());
         var ctx = new TravelMovementContext(movementInput, ci, inputDirection);
+
+		// config
+		if (inputManager().rawInput(Input.CROUCH) && inputManager.rawInput(Input.SPRINT) && user.isOnGround()) {
+			configTicks++;
+			if (configTicks > 100 && user instanceof PlayerEntity) {
+				configTicks = 0;
+				Objects.requireNonNull(configCallback).run();
+			}
+		} else {
+			configTicks = 0;
+		}
 
         // brake
         if ( (      user.isOnGround()
