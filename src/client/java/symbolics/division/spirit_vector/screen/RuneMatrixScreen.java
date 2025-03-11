@@ -3,6 +3,7 @@ package symbolics.division.spirit_vector.screen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.slot.Slot;
@@ -33,7 +34,6 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 
 	@Override
 	protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-//		context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 4210752, false);
 		context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY + 44, 4210752, false);
 	}
 

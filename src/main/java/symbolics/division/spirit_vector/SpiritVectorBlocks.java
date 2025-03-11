@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +30,14 @@ public class SpiritVectorBlocks {
 
 		@Override
 		public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-			if (!SpellDimension.SPELL_DIMENSION.isCasting()) {
+			if (!SpellDimension.SPELL_DIMENSION.isCasting() && !state.get(REAL)) {
+				world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			}
+		}
+
+		@Override
+		protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+			if (!SpellDimension.SPELL_DIMENSION.isCasting() && state.get(REAL)) {
 				world.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		}
@@ -40,7 +48,7 @@ public class SpiritVectorBlocks {
 	}
 
 	public static final Block MATERIA = of("materia", new Materia(
-		AbstractBlock.Settings.create().mapColor(MapColor.STONE_GRAY).strength(-1, 3600000).dropsNothing().allowsSpawning(Blocks::never).solidBlock(Blocks::never).nonOpaque()
+		AbstractBlock.Settings.create().mapColor(MapColor.STONE_GRAY).strength(-1, 3600000).dropsNothing().allowsSpawning(Blocks::never).solidBlock(Blocks::never).nonOpaque().ticksRandomly()
 	));
 
 	private static Block of(String id, Block block) {

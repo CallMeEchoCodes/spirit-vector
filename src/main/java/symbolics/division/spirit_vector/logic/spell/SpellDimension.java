@@ -2,11 +2,13 @@ package symbolics.division.spirit_vector.logic.spell;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.minecraft.MinecraftVersion;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.GrassBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.GrassColors;
 import symbolics.division.spirit_vector.SpiritVectorBlocks;
+import symbolics.division.spirit_vector.SpiritVectorMod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +71,10 @@ public class SpellDimension {
 		List<Pair<World, BlockPos>> toRemove = new ArrayList<>();
 		int removed = EIDOS_PER_TICK;
 		for (var entry : eidosTracker.entrySet()) {
+			if (entry.getKey() == null) {
+				SpiritVectorMod.LOGGER.info("KEY IS NULL FIX ME");
+				continue;
+			}
 			if (!entry.getKey().getFirst().equals(world)) continue;
 			if (removed <= 0) break;
 			if (entry.getValue().tick()) {
@@ -90,6 +96,10 @@ public class SpellDimension {
 			}
 		}
 		for (var key : toRemove) eidosTracker.remove(key);
+	}
+
+	public void clearEidos() {
+		eidosTracker.clear();
 	}
 
 	public boolean isCasting() {

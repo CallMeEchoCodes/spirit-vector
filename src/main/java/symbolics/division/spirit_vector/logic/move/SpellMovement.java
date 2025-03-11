@@ -34,6 +34,7 @@ public class SpellMovement extends NeutralMovement {
 	public boolean testMovementCondition(SpiritVector sv, TravelMovementContext ctx) {
 		InputManager input = sv.inputManager();
 		if (
+			!SpellDimension.SPELL_DIMENSION.isCasting() &&
 			!sv.user.isOnGround() &&
 			sv.getMomentum() >= SpiritVector.MAX_MOMENTUM * 0.9 &&
 			input.pressed(Input.CROUCH) &&

@@ -3,6 +3,7 @@ package symbolics.division.spirit_vector;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -63,6 +64,7 @@ public final class SpiritVectorMod implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(PhysicalizeMateriaPayloadC2S.ID, PhysicalizeMateriaPayloadC2S::HANDLER);
 
 		ServerTickEvents.START_WORLD_TICK.register(SpellDimension::worldTick);
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> SpellDimension.SPELL_DIMENSION.clearEidos());
 
 		// hoping this covers all cases where players should be updated on wing state
 		// TODO doesn't seem to work, figure out during integration with larger sample size

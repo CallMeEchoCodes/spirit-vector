@@ -40,6 +40,7 @@ import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXPack;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class SpiritVector {
 
@@ -51,6 +52,7 @@ public class SpiritVector {
     private static final Identifier MODIFY_MOMENTUM_COOLDOWN_STATE = SpiritVectorMod.id("momentum_cd_state");
 
 	public static Runnable configCallback = null;
+	public static Consumer<Integer> colorCallback = null;
 
     public static SpiritVector of(LivingEntity user, ItemStack itemStack) {
         return VectorType.getFromStack(itemStack).factory().make(user, itemStack);
@@ -101,7 +103,6 @@ public class SpiritVector {
     }
 
     protected SpiritVector(LivingEntity user, ItemStack itemStack, VectorType type) {
-
         this.sfx = SFXPack.getFromStack(itemStack, user.getUuid());
         this.effectsManager = new EffectsManager(this);
         this.user = user;
@@ -121,6 +122,7 @@ public class SpiritVector {
             abilities.get(slot).getMovement().configure(this);
         }
 
+		colorCallback.accept(this.sfx.color());
     }
 
     public void travel(Vec3d movementInput, CallbackInfo ci) {

@@ -2,12 +2,15 @@ package symbolics.division.spirit_vector;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.model.ModelPart;
@@ -104,7 +107,9 @@ public class SpiritVectorClient implements ClientModInitializer {
 		SpellDimension.setSpellCallback(SpellDimensionRenderer.SDR::configureSpell);
 		ClientTickEvents.START_WORLD_TICK.register(SpellDimension::worldTick);
 
+		SpiritVector.colorCallback = SpellDimensionRenderer::setMateriaColor;
 		BlockRenderLayerMap.INSTANCE.putBlock(SpiritVectorBlocks.MATERIA, RenderLayer.getTranslucent());
+		ColorProviderRegistry.BLOCK.register((state, view, pos, tintIndex) -> SpellDimensionRenderer.provideMateriaColor(), SpiritVectorBlocks.MATERIA);
 
 		SpellFXEvents.INSTANCE = new SpellFX();
 
@@ -112,7 +117,6 @@ public class SpiritVectorClient implements ClientModInitializer {
 
 		SpiritVector.configCallback = ()  -> {
 			ClientPlayNetworking.send(new OpenRMConfigRequestPayloadC2S());
-			ExperienceBarUpdateS2CPacket
 		};
 	}
 

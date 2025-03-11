@@ -9,6 +9,7 @@ import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
+import net.minecraft.block.Blocks;
 import net.minecraft.data.client.*;
 import net.minecraft.data.server.recipe.*;
 import net.minecraft.item.Item;
@@ -28,6 +29,7 @@ import symbolics.division.spirit_vector.sfx.SFXPack;
 import symbolics.division.spirit_vector.sfx.SFXRegistry;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
@@ -49,7 +51,30 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-			blockStateModelGenerator.registerSimpleCubeAll(SpiritVectorBlocks.MATERIA);
+			TextureMap map = TextureMap.all(SpiritVectorBlocks.MATERIA);
+			Model model = new Model(
+				Optional.of(Identifier.ofVanilla("block/leaves")),
+				Optional.empty(),
+				TextureKey.ALL
+			);
+//			.upload(
+//				SpiritVectorBlocks.MATERIA,
+//				map,
+//				blockStateModelGenerator.modelCollector
+//			);
+
+			blockStateModelGenerator.registerSingleton(
+				SpiritVectorBlocks.MATERIA,
+				map,
+				model
+			);
+
+//			blockStateModelGenerator.blockStateCollector.accept(
+//				VariantsBlockStateSupplier.create(SpiritVectorBlocks.MATERIA
+//					).coordinate(BlockStateModelGenerator.create)
+//			);
+//			blockStateModelGenerator.registerParented(Blocks.OAK_LEAVES, SpiritVectorBlocks.MATERIA);
+//			blockStateModelGenerator.registerSimpleCubeAll(SpiritVectorBlocks.MATERIA);
 		}
 
 		@Override
