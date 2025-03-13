@@ -1,10 +1,8 @@
 package symbolics.division.spirit_vector.screen;
 
-import net.minecraft.client.MinecraftClient;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
@@ -65,8 +63,10 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 		int y1 = MODE_SLOT_TOP_OFFSET + this.y;
 		int y2 = y1 + 16;
 		if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) {
-			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_CLICK, 1);
+			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_BUZZ, 1);
 			this.client.interactionManager.clickButton(this.handler.syncId, 1);
+		} else if (this.focusedSlot != null && (!this.handler.getCursorStack().isEmpty() || this.focusedSlot.hasStack())) {
+			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_CLICK, 1);
 		}
 		return super.mouseClicked(mouseX, mouseY, button);
 	}

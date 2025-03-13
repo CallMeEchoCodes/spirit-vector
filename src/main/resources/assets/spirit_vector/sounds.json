@@ -41,6 +41,24 @@
 	  "spirit_vector:rm_ambiance"
     ]
   },
+  "sfx.rune_matrix.buzz": {
+  	  "subtitle": "subtitles.spirit_vector.rune_matrix.buzz",
+	  "sounds": [
+		  "spirit_vector:rm_buzz"
+	  ]
+  },
+	"sfx.rune_matrix.cast": {
+		"subtitle": "subtitles.spirit_vector.rune_matrix.cast",
+		"sounds": [
+			"spirit_vector:rm_cast"
+		]
+	},
+	"sfx.rune_matrix.start": {
+		"subtitle": "subtitles.spirit_vector.rune_matrix.start",
+		"sounds": [
+			"spirit_vector:rm_start"
+		]
+	},
   "cassette.take_break": {
     "subtitle": "subtitles.spirit_vector.cassette.take_break",
     "sounds": [

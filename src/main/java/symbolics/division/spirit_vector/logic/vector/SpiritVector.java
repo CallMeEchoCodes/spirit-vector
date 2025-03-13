@@ -133,7 +133,7 @@ public class SpiritVector {
 		// config
 		if (inputManager().rawInput(Input.CROUCH) && inputManager.rawInput(Input.SPRINT) && user.isOnGround()) {
 			configTicks++;
-			if (configTicks > 100 && user instanceof PlayerEntity) {
+			if (configTicks > 60 && user instanceof PlayerEntity) {
 				configTicks = 0;
 				Objects.requireNonNull(configCallback).run();
 			}

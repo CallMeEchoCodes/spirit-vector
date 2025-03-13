@@ -1,5 +1,6 @@
 package symbolics.division.spirit_vector.logic.spell;
 
+import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -32,7 +33,7 @@ public record Eidos(Set<Vector3fc> core, float size) {
 				anchor.getZ() + zx.x()
 			);
 			if (world.isAir(pos)) {
-				world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState());
+				world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState(), Block.NOTIFY_LISTENERS);
 			}
 		}
 	}

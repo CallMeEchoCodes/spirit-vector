@@ -31,15 +31,20 @@ public class SpiritVectorBlocks {
 		@Override
 		public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
 			if (!SpellDimension.SPELL_DIMENSION.isCasting() && !state.get(REAL)) {
-				world.setBlockState(pos, Blocks.AIR.getDefaultState());
+				world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 			}
 		}
 
 		@Override
 		protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 			if (!SpellDimension.SPELL_DIMENSION.isCasting() && state.get(REAL)) {
-				world.setBlockState(pos, Blocks.AIR.getDefaultState());
+				world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 			}
+		}
+
+		@Override
+		protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+			super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
 		}
 
 		public static boolean removable(BlockState state, boolean real) {

@@ -1,6 +1,7 @@
 package symbolics.division.spirit_vector.networking;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -34,7 +35,7 @@ public record PhysicalizeMateriaPayloadC2S(int ticksLeft, List<BlockPos> blocks)
 			int size = 1;
 			BlockPos bp = player.getBlockPos();
 			for (BlockPos pos : payload.blocks) {
-				world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState().with(SpiritVectorBlocks.REAL, true));
+				world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState().with(SpiritVectorBlocks.REAL, true), Block.NOTIFY_LISTENERS);
 				size = (int)Math.ceil(Math.max(size, MathHelper.sqrt((float)bp.getSquaredDistance(pos))));
 			}
 			SpellDimension.SPELL_DIMENSION.eidosPlaced(world, bp, size, payload.ticksLeft);

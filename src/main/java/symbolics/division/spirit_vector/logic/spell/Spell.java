@@ -77,8 +77,6 @@ public class Spell {
 				}
 			}
 		}
-
-		SpellFXEvents.openSpellDimension();
 	}
 
 	public void tick(SpellDimension spellDimension) {

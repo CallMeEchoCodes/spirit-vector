@@ -2,6 +2,7 @@ package symbolics.division.spirit_vector.logic.spell;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.GrassBlock;
 import net.minecraft.util.math.BlockPos;
@@ -72,7 +73,7 @@ public class SpellDimension {
 		int removed = EIDOS_PER_TICK;
 		for (var entry : eidosTracker.entrySet()) {
 			if (entry.getKey() == null) {
-				SpiritVectorMod.LOGGER.info("KEY IS NULL FIX ME");
+				SpiritVectorMod.LOGGER.error("KEY IS NULL FIX ME");
 				continue;
 			}
 			if (!entry.getKey().getFirst().equals(world)) continue;
@@ -90,7 +91,7 @@ public class SpellDimension {
 					pos.getY() + info.size,
 					pos.getZ() + info.size)) {
 					if (SpiritVectorBlocks.Materia.removable(world.getBlockState(blockPos), !world.isClient)) {
-						world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
+						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 					}
 				}
 			}

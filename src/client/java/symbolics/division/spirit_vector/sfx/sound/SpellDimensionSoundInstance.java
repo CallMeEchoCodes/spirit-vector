@@ -14,6 +14,7 @@ public class SpellDimensionSoundInstance extends MovingSoundInstance {
 	private final PlayerEntity player;
 //	private static final int FADE_TICKS = 20;
 //	private static final float MAX_VOLUME = 0.8f;
+	private int ticksPlaying = 0;
 
 	public SpellDimensionSoundInstance(PlayerEntity player) {
 		super(SpiritVectorSounds.RUNE_MATRIX_AMBIANCE, SoundCategory.AMBIENT, player.getRandom());
@@ -22,20 +23,24 @@ public class SpellDimensionSoundInstance extends MovingSoundInstance {
 		this.repeatDelay = 0;
 		this.volume = 0.1f;
 		this.pitch = 1.0f + (player.getRandom().nextFloat() * 0.2f) - 0.1f;
+		this.ticksPlaying = 0;
 	}
 
 	@Override
 	public void tick() {
-		int FADE_TICKS = 20;
+		int FADE_TICKS = 20 * 3;
 		float MAX_VOLUME = 0.6f;
-		if (!this.player.isRemoved() && shouldPlayFor(this.player)) {
+		int SOUND_LENGTH = 20 *5;
+		this.ticksPlaying++;
+		if (!this.player.isRemoved() && shouldPlayFor(this.player) && this.ticksPlaying < SOUND_LENGTH) {
 			this.volume = Math.min(MAX_VOLUME, volume + (MAX_VOLUME / FADE_TICKS));
 			this.x = this.player.getX();
 			this.y = this.player.getY();
 			this.z = this.player.getZ();
 		} else {
-			this.volume = Math.max(0, volume - (MAX_VOLUME / FADE_TICKS));
-			if (this.volume == 0) {
+			int fade = this.ticksPlaying >= SOUND_LENGTH ? FADE_TICKS / 3 : FADE_TICKS;
+			this.volume = Math.max(0, volume - (MAX_VOLUME / fade));
+			if (this.volume == 0 && ! shouldPlayFor(this.player)) {
 				this.setDone();
 			}
 		}

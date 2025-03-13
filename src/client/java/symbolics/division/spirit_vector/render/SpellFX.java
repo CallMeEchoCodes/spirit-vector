@@ -11,6 +11,11 @@ public class SpellFX extends SpellFXEvents {
 
 	@Override
 	public void openSpellDimensionCallback() {
-//		SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_AMBIANCE, 1);
+		SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_CAST, 1);
+	}
+
+	@Override
+	public void activateRuneMatrixCallback() {
+		SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_START, 1);
 	}
 }

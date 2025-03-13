@@ -9,7 +9,6 @@ import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
-import net.minecraft.block.Blocks;
 import net.minecraft.data.client.*;
 import net.minecraft.data.server.recipe.*;
 import net.minecraft.item.Item;
@@ -57,24 +56,12 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 				Optional.empty(),
 				TextureKey.ALL
 			);
-//			.upload(
-//				SpiritVectorBlocks.MATERIA,
-//				map,
-//				blockStateModelGenerator.modelCollector
-//			);
 
 			blockStateModelGenerator.registerSingleton(
 				SpiritVectorBlocks.MATERIA,
 				map,
 				model
 			);
-
-//			blockStateModelGenerator.blockStateCollector.accept(
-//				VariantsBlockStateSupplier.create(SpiritVectorBlocks.MATERIA
-//					).coordinate(BlockStateModelGenerator.create)
-//			);
-//			blockStateModelGenerator.registerParented(Blocks.OAK_LEAVES, SpiritVectorBlocks.MATERIA);
-//			blockStateModelGenerator.registerSimpleCubeAll(SpiritVectorBlocks.MATERIA);
 		}
 
 		@Override
@@ -156,9 +143,9 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 
 			DreamRuneItem[] runes = SpiritVectorItems.getDreamRunes().toArray(DreamRuneItem[]::new);
 
-			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.LEFT_SLOT_TEMPLATE);
-			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.RIGHT_SLOT_TEMPLATE);
-			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.UP_SLOT_TEMPLATE);
+//			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.LEFT_SLOT_TEMPLATE);
+//			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.RIGHT_SLOT_TEMPLATE);
+//			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.UP_SLOT_TEMPLATE);
 
 			SmithingTrimRecipeJsonBuilder.create(
 							Ingredient.fromTag(SpiritVectorTags.Items.SFX_PACK_TEMPLATES),
@@ -173,9 +160,9 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 				genSpiritVectorRecipe(exporter, core);
 			}
 
-			genVectorRuneRecipe(exporter, SpiritVectorItems.LEFT_SLOT_TEMPLATE, "ses", "ees", "ses");
-			genVectorRuneRecipe(exporter, SpiritVectorItems.UP_SLOT_TEMPLATE, "ses", "eee", "sss");
-			genVectorRuneRecipe(exporter, SpiritVectorItems.RIGHT_SLOT_TEMPLATE, "ses", "see", "ses");
+//			genVectorRuneRecipe(exporter, SpiritVectorItems.LEFT_SLOT_TEMPLATE, "ses", "ees", "ses");
+//			genVectorRuneRecipe(exporter, SpiritVectorItems.UP_SLOT_TEMPLATE, "ses", "eee", "sss");
+//			genVectorRuneRecipe(exporter, SpiritVectorItems.RIGHT_SLOT_TEMPLATE, "ses", "see", "ses");
 		}
 
 		void genSlotTemplateUpgrade(RecipeExporter exporter, DreamRuneItem[] runes, SlotTemplateItem slot) {

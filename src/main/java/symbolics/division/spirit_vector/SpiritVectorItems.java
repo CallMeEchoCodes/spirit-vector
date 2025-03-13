@@ -44,9 +44,9 @@ public final class SpiritVectorItems {
     public static final DreamRuneItem WATER_RUN_RUNE = registerRuneAndModel("water_run", WaterRunAbility::new);
     public static final DreamRuneItem COSMETIC_WINGS_RUNE = registerRuneAndModel("cosmetic_wings", CosmeticWingsAbility::new);
 
-    public static final SlotTemplateItem LEFT_SLOT_TEMPLATE = registerAndModel("burst_rune_left", new SlotTemplateItem(AbilitySlot.LEFT));
-    public static final SlotTemplateItem UP_SLOT_TEMPLATE = registerAndModel("burst_rune_up", new SlotTemplateItem(AbilitySlot.UP));
-    public static final SlotTemplateItem RIGHT_SLOT_TEMPLATE = registerAndModel("burst_rune_right", new SlotTemplateItem(AbilitySlot.RIGHT));
+     public static final SlotTemplateItem LEFT_SLOT_TEMPLATE = registerAndModel("burst_rune_left", new SlotTemplateItem(AbilitySlot.LEFT));
+     public static final SlotTemplateItem UP_SLOT_TEMPLATE = registerAndModel("burst_rune_up", new SlotTemplateItem(AbilitySlot.UP));
+     public static final SlotTemplateItem RIGHT_SLOT_TEMPLATE = registerAndModel("burst_rune_right", new SlotTemplateItem(AbilitySlot.RIGHT));
 
     public static final MomentumGaugeItem MOMENTUM_GAUGE = registerAndModel("style_meter", new MomentumGaugeItem());
 

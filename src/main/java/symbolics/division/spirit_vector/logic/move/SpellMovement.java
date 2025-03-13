@@ -48,6 +48,7 @@ public class SpellMovement extends NeutralMovement {
 			((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
 			sv.arrowManager().consumeAll();
 			sv.stateManager().enableStateFor(CASTING_STATE_ID, MAX_CASTING_TICKS);
+			SpellFXEvents.activateRuneMatrix();
 			return true;
 		}
 		return false;
@@ -60,7 +61,7 @@ public class SpellMovement extends NeutralMovement {
 
 	@Override
 	public void exit(SpiritVector sv, TravelMovementContext ctx) {
-		sv.effectsManager().spawnRing(sv.user.getPos(), new Vec3d(0 ,1 ,0));
+		SpellFXEvents.openSpellDimension();
 		sv.user.setVelocity(
 			MovementUtils.augmentedInput(sv, ctx).multiply(0.6).add(0, 0.5, 0)
 		);
