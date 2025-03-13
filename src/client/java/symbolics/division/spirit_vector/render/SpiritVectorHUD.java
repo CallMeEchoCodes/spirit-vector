@@ -153,7 +153,7 @@ public class SpiritVectorHUD {
 				int danceSep = DANCE_WIDTH / 3;
 
 				for (Arrow dir : Arrow.values()) {
-					int left = dir.ordinal() * danceSep;
+					int left = dir.ddrIndex * danceSep;
 					int x = leftAnchor + left - offx;
 					int y = topAnchor - offy;
 
@@ -175,7 +175,7 @@ public class SpiritVectorHUD {
 					}
 					ticksArrowsVisible[i]++;
 					Arrow arrow = eigenCode.get(i);
-					int left = arrow.ordinal() * danceSep;
+					int left = arrow.ddrIndex * danceSep;
 
 					int x = leftAnchor + left - offx; //mid + left * sep + offx;
 					int y = topAnchor - ticksArrowsVisible[i] * 4 - offy;
