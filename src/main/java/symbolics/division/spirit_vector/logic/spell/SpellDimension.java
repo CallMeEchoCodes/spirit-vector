@@ -71,32 +71,34 @@ public class SpellDimension {
 	private void cullEidos(World world) {
 		List<Pair<World, BlockPos>> toRemove = new ArrayList<>();
 		int removed = EIDOS_PER_TICK;
-		for (var entry : eidosTracker.entrySet()) {
-			if (entry.getKey() == null) {
-				SpiritVectorMod.LOGGER.error("KEY IS NULL FIX ME");
-				continue;
-			}
-			if (!entry.getKey().getFirst().equals(world)) continue;
-			if (removed <= 0) break;
-			if (entry.getValue().tick()) {
-				removed--;
-				toRemove.add(entry.getKey());
-				BlockPos pos = entry.getKey().getSecond();
-				EidosInfo info = entry.getValue();
-				for (BlockPos blockPos : BlockPos.iterate(
-					pos.getX() - info.size,
-					pos.getY() - info.size,
-					pos.getZ() - info.size,
-					pos.getX() + info.size,
-					pos.getY() + info.size,
-					pos.getZ() + info.size)) {
-					if (SpiritVectorBlocks.Materia.removable(world.getBlockState(blockPos), !world.isClient)) {
-						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
+		synchronized (eidosTracker) { // lazy (programmer) singleplayer solution
+			for (var entry : eidosTracker.entrySet()) {
+				if (entry.getKey() == null) {
+					SpiritVectorMod.LOGGER.error("KEY IS NULL FIX ME");
+					continue;
+				}
+				if (!entry.getKey().getFirst().equals(world)) continue;
+				if (removed <= 0) break;
+				if (entry.getValue().tick()) {
+					removed--;
+					toRemove.add(entry.getKey());
+					BlockPos pos = entry.getKey().getSecond();
+					EidosInfo info = entry.getValue();
+					for (BlockPos blockPos : BlockPos.iterate(
+						pos.getX() - info.size,
+						pos.getY() - info.size,
+						pos.getZ() - info.size,
+						pos.getX() + info.size,
+						pos.getY() + info.size,
+						pos.getZ() + info.size)) {
+						if (SpiritVectorBlocks.Materia.removable(world.getBlockState(blockPos), !world.isClient)) {
+							world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
+						}
 					}
 				}
 			}
+			for (var key : toRemove) eidosTracker.remove(key);
 		}
-		for (var key : toRemove) eidosTracker.remove(key);
 	}
 
 	public void clearEidos() {

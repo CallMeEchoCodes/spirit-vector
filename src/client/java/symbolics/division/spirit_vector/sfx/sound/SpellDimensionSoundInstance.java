@@ -32,13 +32,13 @@ public class SpellDimensionSoundInstance extends MovingSoundInstance {
 		float MAX_VOLUME = 0.6f;
 		int SOUND_LENGTH = 20 *5;
 		this.ticksPlaying++;
-		if (!this.player.isRemoved() && shouldPlayFor(this.player) && this.ticksPlaying < SOUND_LENGTH) {
+		if (!this.player.isRemoved() && shouldPlayFor(this.player) ){ // && this.ticksPlaying < SOUND_LENGTH) {
 			this.volume = Math.min(MAX_VOLUME, volume + (MAX_VOLUME / FADE_TICKS));
 			this.x = this.player.getX();
 			this.y = this.player.getY();
 			this.z = this.player.getZ();
 		} else {
-			int fade = this.ticksPlaying >= SOUND_LENGTH ? FADE_TICKS / 3 : FADE_TICKS;
+			int fade = FADE_TICKS; // this.ticksPlaying >= SOUND_LENGTH ? FADE_TICKS / 3 : FADE_TICKS;
 			this.volume = Math.max(0, volume - (MAX_VOLUME / fade));
 			if (this.volume == 0 && ! shouldPlayFor(this.player)) {
 				this.setDone();
