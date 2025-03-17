@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "spirit_vector:cassette.perception_rebound"
+  },
+  "description": {
+    "translate": "jukebox_song.spirit_vector.cassette.perception_rebound.desc"
+  },
+  "length_in_seconds":213,
+  "comparator_output": 15
+}

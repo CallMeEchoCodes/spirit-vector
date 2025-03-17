@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "spirit_vector:cassette.sonic_bee"
+  },
+  "description": {
+    "translate": "jukebox_song.spirit_vector.cassette.sonic_bee.desc"
+  },
+  "length_in_seconds": 131,
+  "comparator_output": 15
+}

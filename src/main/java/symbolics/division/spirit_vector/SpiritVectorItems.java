@@ -52,6 +52,13 @@ public final class SpiritVectorItems {
 
     public static final Item TAKE_BREAK_CASSETTE = registerCassette("take_break");
     public static final Item SHOW_DONE_SONG = registerCassette("show_done");
+	public static final Item PERCEPTION_REBOUND_CASSETTE = registerCassette("perception_rebound");
+
+	static {
+		registerCassette("fratricide");
+		registerCassette("sonic_bee");
+		registerCassette("im_down");
+	}
 
     static {
         for (SimpleSFX pack : SpiritVectorSFX.getSimpleSFX()) {

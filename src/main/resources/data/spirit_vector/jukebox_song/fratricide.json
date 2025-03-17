@@ -1,0 +1,10 @@
+{
+  "sound_event": {
+    "sound_id": "spirit_vector:cassette.fratricide"
+  },
+  "description": {
+    "translate": "jukebox_song.spirit_vector.cassette.fratricide.desc"
+  },
+  "length_in_seconds": 67,
+  "comparator_output": 15
+}

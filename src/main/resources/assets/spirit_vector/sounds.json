@@ -95,7 +95,43 @@
       }
     ]
   },
-  "music.perception_rebound": {
+	"cassette.sonic_bee": {
+		"subtitle": "subtitles.spirit_vector.music.sonic_bee",
+		"sounds": [
+			{
+				"name": "spirit_vector:sonic_bee",
+				"stream": true
+			}
+		]
+	},
+	"music.sonic_bee": {
+		"subtitle": "subtitles.spirit_vector.music.sonic_bee",
+		"sounds": [
+			{
+				"name": "spirit_vector:sonic_bee_stereo",
+				"stream": true
+			}
+		]
+	},
+	"cassette.im_down": {
+		"subtitle": "subtitles.spirit_vector.music.im_down",
+		"sounds": [
+			{
+				"name": "spirit_vector:im_down",
+				"stream": true
+			}
+		]
+	},
+	"music.im_down": {
+		"subtitle": "subtitles.spirit_vector.music.im_down",
+		"sounds": [
+			{
+				"name": "spirit_vector:im_down_stereo",
+				"stream": true
+			}
+		]
+	},
+  "cassette.perception_rebound": {
     "subtitle": "subtitles.spirit_vector.music.perception_rebound",
     "sounds": [
       {
@@ -113,7 +149,7 @@
       }
     ]
   },
-  "music.fratricide": {
+  "cassette.fratricide": {
     "subtitle": "subtitles.spirit_vector.music.fratricide",
     "sounds": [
       {
@@ -122,6 +158,15 @@
       }
     ]
   },
+	"music.fratricide": {
+		"subtitle": "subtitles.spirit_vector.music.fratricide",
+		"sounds": [
+			{
+				"name": "spirit_vector:fratricide",
+				"stream": true
+			}
+		]
+	},
   "music.fratricide.loop": {
     "subtitle": "subtitles.spirit_vector.music.fratricide",
     "sounds": [
