@@ -58,6 +58,7 @@ public final class SpiritVectorItems {
 		registerCassette("fratricide");
 		registerCassette("sonic_bee");
 		registerCassette("im_down");
+		registerCassette("emulator");
 	}
 
     static {

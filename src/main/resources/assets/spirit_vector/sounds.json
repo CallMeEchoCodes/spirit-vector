@@ -131,6 +131,24 @@
 			}
 		]
 	},
+	"cassette.emulator": {
+		"subtitle": "subtitles.spirit_vector.music.emulator",
+		"sounds": [
+			{
+				"name": "spirit_vector:emulator",
+				"stream": true
+			}
+		]
+	},
+	"music.emulator": {
+		"subtitle": "subtitles.spirit_vector.music.emulator",
+		"sounds": [
+			{
+				"name": "spirit_vector:emulator_stereo",
+				"stream": true
+			}
+		]
+	},
   "cassette.perception_rebound": {
     "subtitle": "subtitles.spirit_vector.music.perception_rebound",
     "sounds": [

@@ -24,6 +24,7 @@ public class SpiritVectorSounds {
     public static final SoundEvent SHOW_DONE_SONG = register("music.show_done");
 	public static final SoundEvent SONIC_BEE_SONG = register("music.sonic_bee");
 	public static final SoundEvent IM_DOWN_SONG = register("music.im_down");
+	public static final SoundEvent EMULATOR_SONG = register("music.emulator");
     public static final SoundEvent PERCEPTION_REBOUND_SONG = register("music.perception_rebound");
     public static final SoundEvent PERCEPTION_REBOUND_LOOP = register("music.perception_rebound.loop");
     public static final SoundEvent FRATRICIDE_SONG = register("music.fratricide");
