@@ -1,6 +1,8 @@
 package symbolics.division.spirit_vector.screen;
 
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -32,36 +34,69 @@ import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbilitiesRegis
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbility;
 import symbolics.division.spirit_vector.logic.ability.SpiritVectorHeldAbilities;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
+import symbolics.division.spirit_vector.sfx.SFXPack;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RuneMatrixScreenHandler extends ScreenHandler {
 	public static ScreenHandlerType<RuneMatrixScreenHandler> RUNE_MATRIX =
 		Registry.register(Registries.SCREEN_HANDLER,
-		SpiritVectorMod.id("rune_matrix"),
-		new ScreenHandlerType<>(
-			RuneMatrixScreenHandler::new,
-			FeatureFlags.FEATURE_MANAGER.featureSetOf()
-	));
+			SpiritVectorMod.id("rune_matrix"),
+			new ScreenHandlerType<>(
+				RuneMatrixScreenHandler::new,
+				FeatureFlags.FEATURE_MANAGER.featureSetOf()
+			));
 
-	public static void init() {}
+	public static void init() {
+	}
 
-    public static NamedScreenHandlerFactory createScreenHandlerFactory(boolean wearing, World world, BlockPos pos) {
+	public static NamedScreenHandlerFactory createScreenHandlerFactory(boolean wearing, World world, BlockPos pos) {
 		return new SimpleNamedScreenHandlerFactory(
 			(syncId, playerInventory, player) -> new RuneMatrixScreenHandler(wearing, syncId, playerInventory, ScreenHandlerContext.create(world, pos)),
 			SpiritVectorItem.RUNE_MATRIX_GUI_TITLE
 		);
 	}
 
-    private static class RuneSlot extends Slot {
-		public RuneSlot(Inventory inventory, int index, int x, int y) { super(inventory, index, x, y); }
-		@Override public boolean canInsert(ItemStack stack) {return stack.getItem() instanceof DreamRuneItem; }
-		@Override public boolean canBeHighlighted() { return false; }
+	private static class RuneSlot extends Slot {
+		public RuneSlot(Inventory inventory, int index, int x, int y) {
+			super(inventory, index, x, y);
+		}
+
+		@Override
+		public boolean canInsert(ItemStack stack) {
+			return stack.getItem() instanceof DreamRuneItem;
+		}
+
+		@Override
+		public boolean canBeHighlighted() {
+			return false;
+		}
 	}
 
-	private final ScreenHandlerContext context ;
+	private static class CoreSlot extends Slot {
+		public CoreSlot(Inventory inventory, int index, int x, int y) {
+			super(inventory, index, x, y);
+		}
+
+		@Override
+		public boolean canInsert(ItemStack stack) {
+			return coreLike(stack);
+		}
+
+		@Override
+		public boolean canBeHighlighted() {
+			return false;
+		}
+
+		public static boolean coreLike(ItemStack stack) {
+			return stack.get(SFXPack.COMPONENT) != null;
+		}
+	}
+
+	private final ScreenHandlerContext context;
 	private final Property vectorMode = Property.create();
-	private final Inventory storage = new SimpleInventory(3) {
+	private final Inventory storage = new SimpleInventory(4) {
 		@Override
 		public void markDirty() {
 			super.markDirty();
@@ -71,7 +106,7 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	public final Slot leftSlot;
 	public final Slot upSlot;
 	public final Slot rightSlot;
-//	private ItemStack svItem = ItemStack.EMPTY;
+	public final Slot coreSlot;
 	private final Hand currentHand;
 	private final PlayerEntity player;
 	private final boolean wearing;
@@ -92,8 +127,9 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 		int slotLeftOffset = 56;
 		int slotTopOffset = 7;
 		this.leftSlot = this.addSlot(new RuneSlot(this.storage, 0, slotLeftOffset, slotTopOffset + 25));
-		this.upSlot  = this.addSlot(new RuneSlot(this.storage, 1, slotLeftOffset + 25 , slotTopOffset));
-		this.rightSlot  = this.addSlot(new RuneSlot(this.storage, 2, slotLeftOffset + 50, slotTopOffset + 25));
+		this.upSlot = this.addSlot(new RuneSlot(this.storage, 1, slotLeftOffset + 25, slotTopOffset));
+		this.rightSlot = this.addSlot(new RuneSlot(this.storage, 2, slotLeftOffset + 50, slotTopOffset + 25));
+		this.coreSlot = this.addSlot(new CoreSlot(this.storage, 3, slotLeftOffset + 25, slotTopOffset + 25));
 
 		this.addProperty(this.vectorMode);
 
@@ -108,7 +144,6 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 		for (int i = 0; i < 9; i++) {
 			this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 58 + y_offset));
 		}
-
 
 		if (playerInventory.player.getMainHandStack().getItem() instanceof SpiritVectorItem) {
 			currentHand = Hand.MAIN_HAND;
@@ -127,10 +162,20 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 			}
 		}
 
+		ContainerComponent containerComponent = components.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
+		if (containerComponent != null) {
+			ItemStack stack = containerComponent.copyFirstStack();
+			if (!stack.isEmpty()) {
+				this.coreSlot.setStack(stack);
+			}
+		}
+
 		RegistryEntry<VectorType> mode = getTargetStack().get(VectorType.COMPONENT);
 		if (mode != null) {
 			var v = mode.value();
 			this.vectorMode.set(VectorType.REGISTRY.getRawId(v));
+		} else {
+			this.vectorMode.set(VectorType.REGISTRY.getRawIdOrThrow(VectorType.SPIRIT));
 		}
 	}
 
@@ -141,18 +186,22 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 		if (slot != null && slot.hasStack()) {
 			ItemStack stack = slot.getStack();
 			originalStack = stack.copy();
-			if (slot.id == leftSlot.id  || slot.id == upSlot.id  || slot.id == rightSlot.id) {
+			if (slot.id == leftSlot.id || slot.id == upSlot.id || slot.id == rightSlot.id || slot.id == coreSlot.id) {
 				// rune slots to inv
-				if (!this.insertItem(stack, 3, 39, true)) {
+				if (!this.insertItem(stack, 4, 40, true)) {
 					return ItemStack.EMPTY;
 				}
 				slot.onQuickTransfer(stack, stack);
-			} else if (slot.id >= 3 && slot.id < 39 && stack.getItem() instanceof DreamRuneItem) {
-				Slot[] runeSlots = {leftSlot, upSlot, rightSlot};
-				for (Slot runeSlot : runeSlots) {
-					if (!runeSlot.hasStack() && !this.insertItem(stack, runeSlot.id, runeSlot.id + 1, false)) {
-						return ItemStack.EMPTY;
+			} else if (slot.id >= 4 && slot.id < 40) {
+				if (stack.getItem() instanceof DreamRuneItem) {
+					Slot[] runeSlots = {leftSlot, upSlot, rightSlot};
+					for (Slot runeSlot : runeSlots) {
+						if (!runeSlot.hasStack() && !this.insertItem(stack, runeSlot.id, runeSlot.id + 1, false)) {
+							return ItemStack.EMPTY;
+						}
 					}
+				} else if (CoreSlot.coreLike(stack) && !coreSlot.hasStack() && !this.insertItem(stack, coreSlot.id, coreSlot.id + 1, false)) {
+					return ItemStack.EMPTY;
 				}
 			}
 
@@ -190,8 +239,8 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 	@Override
 	public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
 		int ix = player.getInventory().selectedSlot;
-		if (actionType != SlotActionType.THROW && currentHand == Hand.MAIN_HAND && ix == slotIndex-30) {
-			return;
+		if (actionType != SlotActionType.THROW && currentHand == Hand.MAIN_HAND && ix == slotIndex - 31) {
+			return; //prevent grabbing spirit vector in hotbar
 		}
 		super.onSlotClick(slotIndex, button, actionType, player);
 	}
@@ -215,6 +264,16 @@ public class RuneMatrixScreenHandler extends ScreenHandler {
 			}
 		}
 		stack.set(SpiritVectorHeldAbilities.COMPONENT, newAbilities);
+
+		ItemStack core = coreSlot.getStack();
+		if (!core.isEmpty()) {
+			stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(List.of(core)));
+		} else {
+			stack.set(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
+		}
+
+		stack.set(SFXPack.COMPONENT, core.get(SFXPack.COMPONENT));
+
 		setTargetStack(stack);
 	}
 

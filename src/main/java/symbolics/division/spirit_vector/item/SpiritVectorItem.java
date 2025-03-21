@@ -23,59 +23,59 @@ import java.util.List;
 public class SpiritVectorItem extends ArmorItem {
 	public static Text RUNE_MATRIX_GUI_TITLE = Text.translatable("gui.spirit_vector.screen.rune_matrix");
 
-    public SpiritVectorItem() {
-        super(
-                ArmorMaterials.DIAMOND,
-                Type.BOOTS,
-                new Settings()
-                        .component(SpiritVectorHeldAbilities.COMPONENT, new SpiritVectorHeldAbilities())
-                        .component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(false))
-                        .maxCount(1)
-        );
-    }
+	public SpiritVectorItem() {
+		super(
+			ArmorMaterials.DIAMOND,
+			Type.BOOTS,
+			new Settings()
+				.component(SpiritVectorHeldAbilities.COMPONENT, new SpiritVectorHeldAbilities())
+				.component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(false))
+				.maxCount(1)
+		);
+	}
 
-    @Override
-    public Text getName(ItemStack stack) {
-        VectorType type = stack.getOrDefault(VectorType.COMPONENT, RegistryEntry.of(VectorType.SPIRIT)).value();
-        return SFXPackItem.applySFXToText(stack, this, Text.translatable("item.spirit_vector." + type.id()));
-    }
+	@Override
+	public Text getName(ItemStack stack) {
+		VectorType type = stack.getOrDefault(VectorType.COMPONENT, RegistryEntry.of(VectorType.SPIRIT)).value();
+		return SFXPackItem.applySFXToText(stack, this, Text.translatable("item.spirit_vector." + type.id()));
+	}
 
-    @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
+	@Override
+	public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+		super.appendTooltip(stack, context, tooltip, type);
 
-        var ab = stack.get(SpiritVectorHeldAbilities.COMPONENT);
-        if (ab != null) {
-            tooltip.add(Text.translatable("tooltip.spirit_vector.held_abilities").withColor(0x808080));
-            tooltip.add(abilityText(ab, AbilitySlot.LEFT));
-            tooltip.add(abilityText(ab, AbilitySlot.UP));
-            tooltip.add(abilityText(ab, AbilitySlot.RIGHT));
-        }
-    }
+		var ab = stack.get(SpiritVectorHeldAbilities.COMPONENT);
+		if (ab != null) {
+			tooltip.add(Text.translatable("tooltip.spirit_vector.held_abilities").withColor(0x808080));
+			tooltip.add(abilityText(ab, AbilitySlot.LEFT));
+			tooltip.add(abilityText(ab, AbilitySlot.UP));
+			tooltip.add(abilityText(ab, AbilitySlot.RIGHT));
+		}
+	}
 
-    private MutableText abilityText(SpiritVectorHeldAbilities ab, AbilitySlot slot)  {
-        // idk nobody like these
-        return Text.literal("").withColor(0x808080)
-                .append(Text.literal(slot.arrow).withColor(0xFFA500))
-                .append(" [")
-                .append(Text.keybind(slot.input.key).withColor(0xffffff))
-                .append("] ")
-                .append(Text.translatable(ab.get(slot).getMovement().getTranslationKey()).withColor(0xffffff));
-    }
+	private MutableText abilityText(SpiritVectorHeldAbilities ab, AbilitySlot slot) {
+		// idk nobody like these
+		return Text.literal("").withColor(0x808080)
+			.append(Text.literal(slot.arrow).withColor(0xFFA500))
+			.append(" [")
+			.append(Text.keybind(slot.input.key).withColor(0xffffff))
+			.append("] ")
+			.append(Text.translatable(ab.get(slot).getMovement().getTranslationKey()).withColor(0xffffff));
+	}
 
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
+	@Override
+	public boolean isEnchantable(ItemStack stack) {
+		return true;
+	}
 
-    @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (user.isSneaking()) {
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		if (user.isSneaking()) {
 			user.openHandledScreen(RuneMatrixScreenHandler.createScreenHandlerFactory(false, world, user.getBlockPos()));
-            ItemStack stack = user.getStackInHand(hand);
-            return TypedActionResult.success(stack);
-        }
-        return super.use(world, user, hand);
-    }
+			ItemStack stack = user.getStackInHand(hand);
+			return TypedActionResult.success(stack);
+		}
+		return super.use(world, user, hand);
+	}
 
 }

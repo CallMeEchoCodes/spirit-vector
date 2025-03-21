@@ -3,15 +3,14 @@
 	"package": "symbolics.division.spirit_vector.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-      "EntityMixin",
-      "JukeboxManagerMixin",
-      "LivingEntityAccessor",
-      "LivingEntityMixin",
-      "PlayerEntityMixin",
-      "ServerPlayerEntityMixin",
-      "ServerPlayNetworkHandlerMixin",
-      "SmithingTrimRecipeMixin",
-      "sound.JukeboxSongMixin"
+		"EntityMixin",
+		"JukeboxManagerMixin",
+		"LivingEntityAccessor",
+		"LivingEntityMixin",
+		"PlayerEntityMixin",
+		"ServerPlayerEntityMixin",
+		"ServerPlayNetworkHandlerMixin",
+		"sound.JukeboxSongMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

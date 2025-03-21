@@ -3,30 +3,42 @@ package symbolics.division.spirit_vector;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.*;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
-import net.minecraft.data.client.*;
-import net.minecraft.data.server.recipe.*;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.data.client.BlockStateModelGenerator;
+import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.data.client.Model;
+import net.minecraft.data.client.Models;
+import net.minecraft.data.client.TextureKey;
+import net.minecraft.data.client.TextureMap;
+import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.RecipeExporter;
+import net.minecraft.data.server.recipe.RecipeProvider;
+import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.recipe.*;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RawShapedRecipe;
+import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.*;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import symbolics.division.spirit_vector.item.DreamRuneItem;
-import symbolics.division.spirit_vector.item.SlotTemplateItem;
-import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 import symbolics.division.spirit_vector.sfx.SFXPack;
-import symbolics.division.spirit_vector.sfx.SFXRegistry;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -82,23 +94,23 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 		protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
 
 			getOrCreateTagBuilder(SpiritVectorTags.Items.SPIRIT_VECTOR_CRAFTING_MATERIALS)
-					.add(Items.GOLD_INGOT)
-					.addOptionalTag(ConventionalItemTags.GOLD_INGOTS)
-					.addOptionalTag(SpiritVectorTags.common(RegistryKeys.ITEM, "ingots/brass"));
+				.add(Items.GOLD_INGOT)
+				.addOptionalTag(ConventionalItemTags.GOLD_INGOTS)
+				.addOptionalTag(SpiritVectorTags.common(RegistryKeys.ITEM, "ingots/brass"));
 
 			getOrCreateTagBuilder(SpiritVectorTags.Items.SFX_PACK_ADDITIONS)
-					.add(net.minecraft.item.Items.DIAMOND);
+				.add(net.minecraft.item.Items.DIAMOND);
 
 			getOrCreateTagBuilder(SpiritVectorTags.Items.SFX_PACK_TEMPLATES)
-					.add(SpiritVectorItems.getSfxUpgradeItems().toArray(net.minecraft.item.Item[]::new));
+				.add(SpiritVectorItems.getSfxUpgradeItems().toArray(net.minecraft.item.Item[]::new));
 
 			getOrCreateTagBuilder(SpiritVectorTags.Items.SLOT_UPGRADE_RUNES)
-					.add(SpiritVectorItems.LEFT_SLOT_TEMPLATE)
-					.add(SpiritVectorItems.UP_SLOT_TEMPLATE)
-					.add(SpiritVectorItems.RIGHT_SLOT_TEMPLATE);
+				.add(SpiritVectorItems.LEFT_SLOT_TEMPLATE)
+				.add(SpiritVectorItems.UP_SLOT_TEMPLATE)
+				.add(SpiritVectorItems.RIGHT_SLOT_TEMPLATE);
 
 			getOrCreateTagBuilder(SpiritVectorTags.Items.ABILITY_UPGRADE_RUNES)
-					.add(SpiritVectorItems.getDreamRunes().toArray(net.minecraft.item.Item[]::new));
+				.add(SpiritVectorItems.getDreamRunes().toArray(net.minecraft.item.Item[]::new));
 
 			getOrCreateTagBuilder(ItemTags.FOOT_ARMOR).add(SpiritVectorItems.SPIRIT_VECTOR);
 
@@ -127,8 +139,8 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 		@Override
 		protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
 			getOrCreateTagBuilder(SpiritVectorTags.Misc.JUKEBOX_LOOPING)
-					.add(SpiritVectorSounds.TAKE_BREAK_LOOP)
-					.add(SpiritVectorSounds.SHOW_DONE_LOOP);
+				.add(SpiritVectorSounds.TAKE_BREAK_LOOP)
+				.add(SpiritVectorSounds.SHOW_DONE_LOOP);
 		}
 	}
 
@@ -140,80 +152,45 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generate(RecipeExporter exporter) {
-
-			DreamRuneItem[] runes = SpiritVectorItems.getDreamRunes().toArray(DreamRuneItem[]::new);
-
-//			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.LEFT_SLOT_TEMPLATE);
-//			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.RIGHT_SLOT_TEMPLATE);
-//			genSlotTemplateUpgrade(exporter, runes, SpiritVectorItems.UP_SLOT_TEMPLATE);
-
-			SmithingTrimRecipeJsonBuilder.create(
-							Ingredient.fromTag(SpiritVectorTags.Items.SFX_PACK_TEMPLATES),
-							Ingredient.ofItems(SpiritVectorItems.SPIRIT_VECTOR),
-							Ingredient.fromTag(SpiritVectorTags.Items.SFX_PACK_ADDITIONS),
-							RecipeCategory.TRANSPORTATION
-					).criterion("has_spirit_vector", conditionsFromItem(SpiritVectorItems.SPIRIT_VECTOR))
-					.offerTo(exporter, SpiritVectorMod.id("sfx_alchemy"));
-
 			// sv per-core recipes
 			for (var core : SpiritVectorItems.getSfxUpgradeItems()) {
 				genSpiritVectorRecipe(exporter, core);
 			}
-
-//			genVectorRuneRecipe(exporter, SpiritVectorItems.LEFT_SLOT_TEMPLATE, "ses", "ees", "ses");
-//			genVectorRuneRecipe(exporter, SpiritVectorItems.UP_SLOT_TEMPLATE, "ses", "eee", "sss");
-//			genVectorRuneRecipe(exporter, SpiritVectorItems.RIGHT_SLOT_TEMPLATE, "ses", "see", "ses");
-		}
-
-		void genSlotTemplateUpgrade(RecipeExporter exporter, DreamRuneItem[] runes, SlotTemplateItem slot) {
-			String name;
-			try {
-				 name = slot.getDefaultStack().get(AbilitySlot.COMPONENT).name;
-			} catch (NullPointerException x) {
-				// record scratch freeze frame
-				throw new RuntimeException("You probably tried to make a recipe from an invalid slot template stack");
-			}
-			SmithingTrimRecipeJsonBuilder.create(
-					Ingredient.fromTag(SpiritVectorTags.Items.SLOT_UPGRADE_RUNES),
-					Ingredient.ofItems(SpiritVectorItems.SPIRIT_VECTOR),
-					Ingredient.fromTag(SpiritVectorTags.Items.ABILITY_UPGRADE_RUNES),
-					RecipeCategory.TRANSPORTATION
-			).criterion("has_spirit_vector_slot_template_" + name, conditionsFromItem(slot))
-			.offerTo(exporter, SpiritVectorMod.id(name + "_slot_ability"));
 		}
 
 		private void genVectorRuneRecipe(RecipeExporter exporter, Item rune, String... shape) {
 			var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, rune)
-					.input('e', ConventionalItemTags.EMERALD_GEMS)
-					.input('s', ConventionalItemTags.STONES);
+				.input('e', ConventionalItemTags.EMERALD_GEMS)
+				.input('s', ConventionalItemTags.STONES);
 			for (String line : shape) builder.pattern(line);
 			builder.criterion("has_emerald", conditionsFromItem(net.minecraft.item.Items.EMERALD))
-					.offerTo(exporter);
+				.offerTo(exporter);
 		}
 
 		private void genSpiritVectorRecipe(RecipeExporter exporter, Item core) {
 			Identifier recipeId = Identifier.of(RecipeProvider.getItemPath(SpiritVectorItems.SPIRIT_VECTOR) + "_crafted_from_" + RecipeProvider.getItemPath(core));
 			ItemStack stack = SpiritVectorItems.SPIRIT_VECTOR.getDefaultStack();
-			if (!core.getComponents().get(SFXPack.COMPONENT).getKey().map(SFXRegistry.defaultEntry()::matchesKey).orElse(false)) {
-				// skip adding component if this is the default sfx
-				stack.set(SFXPack.COMPONENT, core.getComponents().get(SFXPack.COMPONENT));
-			}
+
+			stack.set(SFXPack.COMPONENT, core.getComponents().get(SFXPack.COMPONENT));
+			stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(List.of(core.getDefaultStack())));
+
+
 			Advancement.Builder builder = exporter.getAdvancementBuilder()
-					.criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
-					.rewards(AdvancementRewards.Builder.recipe(recipeId))
-					.criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
+				.criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
+				.rewards(AdvancementRewards.Builder.recipe(recipeId))
+				.criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
 			builder.criterion("has_core", conditionsFromItem(core));
 			RawShapedRecipe rawRecipe = RawShapedRecipe.create(
-					Map.of('g', Ingredient.fromTag(SpiritVectorTags.Items.SPIRIT_VECTOR_CRAFTING_MATERIALS), 'c', Ingredient.ofItems(core)),
-					"gcg",
-					"g g"
+				Map.of('g', Ingredient.fromTag(SpiritVectorTags.Items.SPIRIT_VECTOR_CRAFTING_MATERIALS), 'c', Ingredient.ofItems(core)),
+				"gcg",
+				"g g"
 			);
 			ShapedRecipe recipe = new ShapedRecipe(
-					"",
-					CraftingRecipeJsonBuilder.toCraftingCategory(RecipeCategory.TRANSPORTATION),
-					rawRecipe,
-					stack.copy(),
-					true
+				"",
+				CraftingRecipeJsonBuilder.toCraftingCategory(RecipeCategory.TRANSPORTATION),
+				rawRecipe,
+				stack.copy(),
+				true
 			);
 			exporter.accept(recipeId, recipe, builder.build(recipeId.withPrefixedPath("recipes/" + RecipeCategory.TRANSPORTATION.getName() + "/")));
 		}
