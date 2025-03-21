@@ -1,5 +1,6 @@
 package symbolics.division.spirit_vector.sfx.sound;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.MovingSoundInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -8,12 +9,10 @@ import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 
 public class SpellDimensionSoundInstance extends MovingSoundInstance {
 	public static boolean shouldPlayFor(PlayerEntity player) {
-		return SpellDimension.SPELL_DIMENSION.isCasting();
+		return SpellDimension.SPELL_DIMENSION.isCasting() && MinecraftClient.getInstance().player == player;
 	}
 
 	private final PlayerEntity player;
-//	private static final int FADE_TICKS = 20;
-//	private static final float MAX_VOLUME = 0.8f;
 	private int ticksPlaying = 0;
 
 	public SpellDimensionSoundInstance(PlayerEntity player) {
@@ -30,17 +29,17 @@ public class SpellDimensionSoundInstance extends MovingSoundInstance {
 	public void tick() {
 		int FADE_TICKS = 20 * 3;
 		float MAX_VOLUME = 0.6f;
-		int SOUND_LENGTH = 20 *5;
 		this.ticksPlaying++;
-		if (!this.player.isRemoved() && shouldPlayFor(this.player) ){ // && this.ticksPlaying < SOUND_LENGTH) {
+		if (!this.player.isRemoved() && shouldPlayFor(this.player)) { // && this.ticksPlaying < SOUND_LENGTH) {
 			this.volume = Math.min(MAX_VOLUME, volume + (MAX_VOLUME / FADE_TICKS));
 			this.x = this.player.getX();
 			this.y = this.player.getY();
 			this.z = this.player.getZ();
+			this.volume = Math.max(0.01f, this.volume - 0.01f);
 		} else {
 			int fade = FADE_TICKS; // this.ticksPlaying >= SOUND_LENGTH ? FADE_TICKS / 3 : FADE_TICKS;
 			this.volume = Math.max(0, volume - (MAX_VOLUME / fade));
-			if (this.volume == 0 && ! shouldPlayFor(this.player)) {
+			if (this.volume == 0 && !shouldPlayFor(this.player)) {
 				this.setDone();
 			}
 		}

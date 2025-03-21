@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.sfx.sound.EngineSoundInstance;
 import symbolics.division.spirit_vector.sfx.sound.SlidingSoundInstance;
 import symbolics.division.spirit_vector.sfx.sound.SpellDimensionSoundInstance;
