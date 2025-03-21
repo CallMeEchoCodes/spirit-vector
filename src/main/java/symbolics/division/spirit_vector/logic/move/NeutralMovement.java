@@ -94,14 +94,8 @@ public class NeutralMovement extends AbstractMovementType {
 
 	@Override
 	public void updateValues(SpiritVector sv) {
-		if (sv.is(VectorType.DREAM) && sv.horizontalSpeed() >= DreamVector.MOMENTUM_GAIN_SPEED) return;
-		if (sv.is(VectorType.BURST)) {
-			if (sv.groundTicks() > 20) { // one second on ground
-				sv.setMomentum(0);
-			} else {
-				return;
-			}
-		}
+		if (sv.is(VectorType.BURST) || (sv.is(VectorType.DREAM) && sv.horizontalSpeed() >= DreamVector.MOMENTUM_GAIN_SPEED))
+			return;
 		if (sv.user.age % 20 == 0 && !sv.stateManager().isActive(SpiritVector.MOMENTUM_DECAY_GRACE_STATE)) {
 			sv.modifyMomentum(-1);
 		}
