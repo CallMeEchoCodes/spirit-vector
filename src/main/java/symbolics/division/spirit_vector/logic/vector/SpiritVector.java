@@ -14,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -44,91 +43,98 @@ import java.util.function.Consumer;
 
 public class SpiritVector {
 
-    public static final int MAX_MOMENTUM = 100;
-    public static final int MOMENTUM_FAST_THRESHOLD = MAX_MOMENTUM / 4;
-    public static final float MINIMUM_SPEED_FOR_TRAIL_WHILE_SOARING = 0.2f;
-    public static final Identifier MOMENTUM_DECAY_GRACE_STATE = SpiritVectorMod.id("momentum_decay_grace");
+	public static final int MAX_MOMENTUM = 100;
+	public static final int MOMENTUM_FAST_THRESHOLD = MAX_MOMENTUM / 4;
+	public static final float MINIMUM_SPEED_FOR_TRAIL_WHILE_SOARING = 0.2f;
+	public static final Identifier MOMENTUM_DECAY_GRACE_STATE = SpiritVectorMod.id("momentum_decay_grace");
 
-    private static final Identifier MODIFY_MOMENTUM_COOLDOWN_STATE = SpiritVectorMod.id("momentum_cd_state");
+	private static final Identifier MODIFY_MOMENTUM_COOLDOWN_STATE = SpiritVectorMod.id("momentum_cd_state");
 
 	public static Runnable configCallback = null;
 	public static Consumer<Integer> colorCallback = null;
 
-    public static SpiritVector of(LivingEntity user, ItemStack itemStack) {
-        return VectorType.getFromStack(itemStack).factory().make(user, itemStack);
-    }
+	public static SpiritVector of(LivingEntity user, ItemStack itemStack) {
+		return VectorType.getFromStack(itemStack).factory().make(user, itemStack);
+	}
 
-    @Nullable
-    public static ItemStack getEquippedItem(LivingEntity entity) {
-        if (entity instanceof PlayerEntity player && player.isSpectator()) {
-            return null;
-        }
-        ItemStack item = entity.getEquippedStack(EquipmentSlot.FEET);
-        return item.isOf(SpiritVectorItems.SPIRIT_VECTOR) ? item : null;
-    }
+	@Nullable
+	public static ItemStack getEquippedItem(LivingEntity entity) {
+		if (entity instanceof PlayerEntity player && player.isSpectator()) {
+			return null;
+		}
+		ItemStack item = entity.getEquippedStack(EquipmentSlot.FEET);
+		return item.isOf(SpiritVectorItems.SPIRIT_VECTOR) ? item : null;
+	}
 
-    public static boolean hasEquipped(LivingEntity entity) {
-        return getEquippedItem(entity) != null;
-    }
+	public static boolean hasEquipped(LivingEntity entity) {
+		return getEquippedItem(entity) != null;
+	}
 
-    public final LivingEntity user;
+	public final LivingEntity user;
 
-    protected int momentum = 0;
+	protected int momentum = 0;
 	protected int configTicks = 0;
-    protected MovementType moveState = MovementType.NEUTRAL;
-    protected SpiritVectorAbility queuedAbility; // hand rune input
-    protected Vec3d inputDirection = Vec3d.ZERO;
-    protected Vec3d impulse = Vec3d.ZERO;
-    protected final EffectsManager effectsManager;
-    protected final StateManager stateManager = new StateManager();
-    protected final InputManager inputManager = new InputManager();
+	protected int groundTicks = 0;
+	protected MovementType moveState = MovementType.NEUTRAL;
+	protected SpiritVectorAbility queuedAbility; // hand rune input
+	protected Vec3d inputDirection = Vec3d.ZERO;
+	protected Vec3d impulse = Vec3d.ZERO;
+	protected final EffectsManager effectsManager;
+	protected final StateManager stateManager = new StateManager();
+	protected final InputManager inputManager = new InputManager();
 	protected final ArrowManager arrowManager = new ArrowManager();
-    protected final SFXPack<?> sfx;
-    protected final SpiritVectorHeldAbilities abilities;
-    protected final VectorType type;
+	protected final SFXPack<?> sfx;
+	protected final SpiritVectorHeldAbilities abilities;
+	protected final VectorType type;
 
-    // these are checked in order prior to rune movements
-    protected final MovementType[] movements = {
-			MovementType.SPELL,
-            MovementType.VAULT,
-            MovementType.JUMP,
+	// these are checked in order prior to rune movements
+	protected final MovementType[] movements = {
+		MovementType.SPELL,
+		MovementType.VAULT,
+		MovementType.JUMP,
 //			MovementType.GRIND,
-            MovementType.SLIDE,
-            MovementType.WALL_JUMP,
-            MovementType.WALL_RUSH
-    };
+		MovementType.SLIDE,
+		MovementType.WALL_JUMP,
+		MovementType.WALL_RUSH
+	};
 
-    public SpiritVector(LivingEntity user, ItemStack itemStack) {
-        this(user, itemStack, VectorType.SPIRIT);
-    }
+	public SpiritVector(LivingEntity user, ItemStack itemStack) {
+		this(user, itemStack, VectorType.SPIRIT);
+	}
 
-    protected SpiritVector(LivingEntity user, ItemStack itemStack, VectorType type) {
-        this.sfx = SFXPack.getFromStack(itemStack, user.getUuid());
-        this.effectsManager = new EffectsManager(this);
-        this.user = user;
-        this.type = type;
+	protected SpiritVector(LivingEntity user, ItemStack itemStack, VectorType type) {
+		this.sfx = SFXPack.getFromStack(itemStack, user.getUuid());
+		this.effectsManager = new EffectsManager(this);
+		this.user = user;
+		this.type = type;
 
-        stateManager.register(ParticleTrailEffectState.ID, new ParticleTrailEffectState(this));
-        stateManager.register(WingsEffectState.ID, new WingsEffectState(this));
-        stateManager.register(MODIFY_MOMENTUM_COOLDOWN_STATE, new ManagedState(this));
-        stateManager.register(MOMENTUM_DECAY_GRACE_STATE, new ManagedState(this));
+		stateManager.register(ParticleTrailEffectState.ID, new ParticleTrailEffectState(this));
+		stateManager.register(WingsEffectState.ID, new WingsEffectState(this));
+		stateManager.register(MODIFY_MOMENTUM_COOLDOWN_STATE, new ManagedState(this));
+		stateManager.register(MOMENTUM_DECAY_GRACE_STATE, new ManagedState(this));
 
-        for (MovementType move : movements) {
-            move.configure(this);
-        }
+		for (MovementType move : movements) {
+			move.configure(this);
+		}
 
-        abilities = itemStack.getOrDefault(SpiritVectorHeldAbilities.COMPONENT, new SpiritVectorHeldAbilities());
-        for (AbilitySlot slot : AbilitySlot.values()) {
-            abilities.get(slot).getMovement().configure(this);
-        }
+		abilities = itemStack.getOrDefault(SpiritVectorHeldAbilities.COMPONENT, new SpiritVectorHeldAbilities());
+		for (AbilitySlot slot : AbilitySlot.values()) {
+			abilities.get(slot).getMovement().configure(this);
+		}
 
 		colorCallback.accept(this.sfx.color());
-    }
+	}
 
-    public void travel(Vec3d movementInput, CallbackInfo ci) {
-        stateManager.tick();
-        inputDirection = MovementUtils.movementInputToVelocity(movementInput, 1, user.getYaw());
-        var ctx = new TravelMovementContext(movementInput, ci, inputDirection);
+	public void travel(Vec3d movementInput, CallbackInfo ci) {
+		if (user.isOnGround()) {
+			groundTicks++;
+		} else {
+			groundTicks = 0;
+		}
+
+		stateManager.tick();
+		inputDirection = MovementUtils.movementInputToVelocity(movementInput, 1, user.getYaw());
+		var ctx = new TravelMovementContext(movementInput, ci, inputDirection);
 
 		// config
 		if (inputManager().rawInput(Input.CROUCH) && inputManager.rawInput(Input.SPRINT) && user.isOnGround()) {
@@ -141,165 +147,193 @@ public class SpiritVector {
 			configTicks = 0;
 		}
 
-        // brake
-        if ( (      user.isOnGround()
-                || (getMoveState() == MovementType.WALL_RUSH && user.getVelocity().withAxis(Direction.Axis.Y, 0).lengthSquared() > 0) )
-             && inputManager().rawInput(Input.SPRINT)) {
-            user.setVelocity(user.getVelocity().multiply(0.5));
-        }
+		// brake
+		if ((user.isOnGround()
+			|| (getMoveState() == MovementType.WALL_RUSH && user.getVelocity().withAxis(Direction.Axis.Y, 0).lengthSquared() > 0))
+			&& inputManager().rawInput(Input.SPRINT)) {
+			user.setVelocity(user.getVelocity().multiply(0.5));
+		}
 
 //        MovementType prev = getMoveState();
-        updateMovementType(ctx);
+		updateMovementType(ctx);
 //        if (!prev.getID().equals(getMoveState().getID())) {
 //            SpiritVectorMod.LOGGER.info("state: " + prev.getID().getPath() + " -> " + getMoveState().getID().getPath());
 //        }
 
-        moveState.travel(this, ctx);
-        moveState.updateValues(this);
-        this.queuedAbility = null;
+		moveState.travel(this, ctx);
+		moveState.updateValues(this);
+		this.queuedAbility = null;
 
-        var vel = user.getVelocity();
-        if (isSoaring()) {
-            if (vel.length() >= MINIMUM_SPEED_FOR_TRAIL_WHILE_SOARING) {
-                stateManager().enableStateFor(ParticleTrailEffectState.ID, 1);
-            }
-            stateManager().enableStateFor(WingsEffectState.ID, 1);
-        }
-    }
+		var vel = user.getVelocity();
+		if (isSoaring()) {
+			if (vel.length() >= MINIMUM_SPEED_FOR_TRAIL_WHILE_SOARING) {
+				stateManager().enableStateFor(ParticleTrailEffectState.ID, 1);
+			}
+			stateManager().enableStateFor(WingsEffectState.ID, 1);
+		}
+	}
 
-    private void updateMovementType(TravelMovementContext ctx) {
-        if (!moveState.testMovementCompleted(this, ctx)) return;
-        moveState.exit(this, ctx);
+	private void updateMovementType(TravelMovementContext ctx) {
+		if (!moveState.testMovementCompleted(this, ctx)) return;
+		moveState.exit(this, ctx);
 
-        // first check standard movements
-        for (MovementType m : movements) {
-            if (m.testMovementCondition(this, ctx)) {
-                moveState = m;
-                return;
-            }
-        }
+		// first check standard movements
+		for (MovementType m : movements) {
+			if (m.testMovementCondition(this, ctx)) {
+				moveState = m;
+				return;
+			}
+		}
 
-        // then test if any abilities apply while in air
-        if (!user.isOnGround()) {
-            if (queuedAbility != null && queuedAbility.cost() < getMomentum()) {
-                moveState = queuedAbility.getMovement();
-                return;
-            }
-            for (AbilitySlot slot : AbilitySlot.values()) {
-                SpiritVectorAbility ability = abilities.get(slot);
-                MovementType move = ability.getMovement();
-                if (
-                        ability.cost() <= getMomentum()
-                        && move.testMovementCondition(this, ctx)
+		// then test if any abilities apply while in air
+		if (!user.isOnGround()) {
+			if (queuedAbility != null && queuedAbility.cost() < getMomentum()) {
+				moveState = queuedAbility.getMovement();
+				return;
+			}
+			for (AbilitySlot slot : AbilitySlot.values()) {
+				SpiritVectorAbility ability = abilities.get(slot);
+				MovementType move = ability.getMovement();
+				if (
+					ability.cost() <= getMomentum()
+						&& move.testMovementCondition(this, ctx)
 						&& inputManager().released(slot.input)
-                ) {
-                    moveState = move;
-                    return;
-                }
-            }
-        }
+				) {
+					moveState = move;
+					return;
+				}
+			}
+		}
 
-        moveState = MovementType.NEUTRAL;
-    }
+		moveState = MovementType.NEUTRAL;
+	}
 
-    public Vec3d getImpulse() { return impulse; }
-    public void setImpulse(Vec3d impulse) { this.impulse = impulse; }
+	public Vec3d getImpulse() {
+		return impulse;
+	}
 
-    public float getMovementSpeed() { return getMovementSpeed(0.6f); }
-    public float getMovementSpeed(float slip) {
-        return user.getMovementSpeed() * (0.21600002F / (slip * slip * slip)) + ((float)getMomentum() / MAX_MOMENTUM) * 0.1f;
-    }
+	public void setImpulse(Vec3d impulse) {
+		this.impulse = impulse;
+	}
 
-    public Vec3d getInputDirection() { return inputDirection; }
+	public float getMovementSpeed() {
+		return getMovementSpeed(0.6f);
+	}
 
-    public float getStepHeight() {
-        return 1.2f;
-    }
+	public float getMovementSpeed(float slip) {
+		return user.getMovementSpeed() * (0.21600002F / (slip * slip * slip)) + ((float) getMomentum() / MAX_MOMENTUM) * 0.1f;
+	}
 
-    public int getMomentum() {
+	public Vec3d getInputDirection() {
+		return inputDirection;
+	}
+
+	public float getStepHeight() {
+		return 1.2f;
+	}
+
+	public int getMomentum() {
 //        return MAX_MOMENTUM;
-        return momentum;
-    }
+		return momentum;
+	}
 
-    public void modifyMomentum(int v) {
+	public void modifyMomentum(int v) {
 		setMomentum(momentum + v);
-    }
-    public boolean modifyMomentumWithCooldown(int v, int cdTicks) {
-        if (!stateManager().isActive(MODIFY_MOMENTUM_COOLDOWN_STATE)) {
-            modifyMomentum(v);
-            stateManager().enableStateFor(MODIFY_MOMENTUM_COOLDOWN_STATE, cdTicks);
-            return true;
-        }
-        return false;
-    }
+	}
+
+	public boolean modifyMomentumWithCooldown(int v, int cdTicks) {
+		if (!stateManager().isActive(MODIFY_MOMENTUM_COOLDOWN_STATE)) {
+			modifyMomentum(v);
+			stateManager().enableStateFor(MODIFY_MOMENTUM_COOLDOWN_STATE, cdTicks);
+			return true;
+		}
+		return false;
+	}
 
 	public void setMomentum(int v) {
 		momentum = Math.clamp(v, 0, MAX_MOMENTUM);
 	}
 
-    public SFXPack<?> getSFX() {
-        return sfx;
-    }
+	public SFXPack<?> getSFX() {
+		return sfx;
+	}
 
-    public VectorType getType() { return type; }
+	public VectorType getType() {
+		return type;
+	}
+
 	public boolean is(VectorType type) {
 		return getType().equals(type);
 	}
 
-    public boolean isSoaring() {
-        // it means you're really cool
-        return getMomentum() >= MOMENTUM_FAST_THRESHOLD;
-    }
+	public boolean isSoaring() {
+		// it means you're really cool
+		return getMomentum() >= MOMENTUM_FAST_THRESHOLD;
+	}
 
-    public void onLanding() {
-        if (this.user.fallDistance > 0.01) {
-            resetJump();
-        }
-    }
+	public void onLanding() {
+		if (this.user.fallDistance > 0.01) {
+			resetJump();
+		}
+	}
 
-    public void resetJump() {
-        inputManager.update(Input.JUMP, false);
-        WallJumpMovement.resetWallJumpPlane(this);
-    }
+	public void resetJump() {
+		inputManager.update(Input.JUMP, false);
+		WallJumpMovement.resetWallJumpPlane(this);
+	}
 
-    public MovementType getMoveState() { return moveState; }
+	public int groundTicks() {
+		return groundTicks;
+	}
 
-    public EffectsManager effectsManager() { return effectsManager; }
+	public MovementType getMoveState() {
+		return moveState;
+	}
 
-    public StateManager stateManager() { return stateManager; }
+	public EffectsManager effectsManager() {
+		return effectsManager;
+	}
 
-    public InputManager inputManager() { return inputManager; }
+	public StateManager stateManager() {
+		return stateManager;
+	}
 
-	public ArrowManager arrowManager() { return arrowManager; }
+	public InputManager inputManager() {
+		return inputManager;
+	}
 
-    public SpiritVectorHeldAbilities heldAbilities() {
-        return abilities;
-    }
+	public ArrowManager arrowManager() {
+		return arrowManager;
+	}
 
-    public SVEntityState entityState() {
-        return new SVEntityState(stateManager().isActive(WingsEffectState.ID));
-    }
+	public SpiritVectorHeldAbilities heldAbilities() {
+		return abilities;
+	}
 
-    public float consumeSpeedMultiplier() {
-        return GroundPoundAbility.consumeSpeedMultiplier(this);
-    }
+	public SVEntityState entityState() {
+		return new SVEntityState(stateManager().isActive(WingsEffectState.ID));
+	}
 
-    public boolean enqueueAbility(SpiritVectorAbility ability) {
-        ability.getMovement().configure(this);
-        queuedAbility = ability;
-        return true;
-    }
+	public float consumeSpeedMultiplier() {
+		return GroundPoundAbility.consumeSpeedMultiplier(this);
+	}
 
-    public double horizontalSpeed() {
-        return user.getVelocity().withAxis(Direction.Axis.Y,0).length();
-    }
+	public boolean enqueueAbility(SpiritVectorAbility ability) {
+		ability.getMovement().configure(this);
+		queuedAbility = ability;
+		return true;
+	}
 
-    public boolean fluidMovementAllowed() {
-        return moveState.fluidMovementAllowed(this);
-    }
+	public double horizontalSpeed() {
+		return user.getVelocity().withAxis(Direction.Axis.Y, 0).length();
+	}
 
-    public float safeFallDistance() {
-        //  broken, ground damage disabled. needs networking.
-        return this.getMoveState().safeFallDistance(this);
-    }
+	public boolean fluidMovementAllowed() {
+		return moveState.fluidMovementAllowed(this);
+	}
+
+	public float safeFallDistance() {
+		//  broken, ground damage disabled. needs networking.
+		return this.getMoveState().safeFallDistance(this);
+	}
 }
