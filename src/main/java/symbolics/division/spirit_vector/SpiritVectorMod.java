@@ -1,11 +1,9 @@
 package symbolics.division.spirit_vector;
 
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -30,9 +28,12 @@ import symbolics.division.spirit_vector.sfx.SFXRequestPayload;
 
 public final class SpiritVectorMod implements ModInitializer {
 	public static final String MODID = "spirit_vector";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	public static Identifier id(String identifier) { return Identifier.of(MODID, identifier); }
+	public static Identifier id(String identifier) {
+		return Identifier.of(MODID, identifier);
+	}
+
 	public static <T extends CustomPayload> CustomPayload.Id<T> payloadId(String identififer) {
 		return new CustomPayload.Id<>(id(identififer));
 	}
@@ -77,6 +78,7 @@ public final class SpiritVectorMod implements ModInitializer {
 
 		ModCompatibility.init();
 	}
+
 	//<T extends CustomPayload> CustomPayload.Type<? super B, T>
 	private <T extends CustomPayload>
 	void registerC2S(CustomPayload.Id<T> pid, PacketCodec<? super RegistryByteBuf, T> codec, ServerPlayNetworking.PlayPayloadHandler<T> handler) {
