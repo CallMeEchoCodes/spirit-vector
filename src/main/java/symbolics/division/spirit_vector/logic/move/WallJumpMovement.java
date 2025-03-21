@@ -79,23 +79,20 @@ public class WallJumpMovement extends AbstractMovementType {
 		if (invertedInput != null) {
 			return new Pair<>(invertedInput, invertedDir);
 		} else {
-			/* REMINDER TO FUTURE SELF DO NOT DO THIS */
-//			if (invertedInput != null) {
-//				return new Pair<>(invertedInput, invertedDir);
-//			} else { // jumping along wall
-//				Direction jumpDirection = Direction.getFacing(input);
-//				Direction right = jumpDirection.rotateYClockwise();
-//				Direction left = jumpDirection.rotateYCounterclockwise();
-//				boolean hasRight = planeState.allowable(right, pos) && MovementUtils.validWallJumpAnchor(world, pos, right);
-//				boolean hasLeft = planeState.allowable(left, pos) && MovementUtils.validWallJumpAnchor(world, pos, left);
-//				Direction result = hasLeft && hasRight && planeState.allowable(jumpDirection, pos) ? jumpDirection // on either side, pretend a wall behind us
-//					: hasLeft ? left // or else jumping along
-//					: hasRight ? right
-//					: null;
-//				if (result != null) {
-//					return new Pair<>(new Vec3d(jumpDirection.getUnitVector()), result);
-//				}
-//			}
+			// jumping along wall
+			Direction jumpDirection = Direction.getFacing(input);
+			Direction right = jumpDirection.rotateYClockwise();
+			Direction left = jumpDirection.rotateYCounterclockwise();
+			boolean hasRight = planeState.allowable(right, pos) && MovementUtils.validWallJumpAnchor(world, pos, right);
+			boolean hasLeft = planeState.allowable(left, pos) && MovementUtils.validWallJumpAnchor(world, pos, left);
+			Direction result = hasLeft && hasRight && planeState.allowable(jumpDirection, pos) ? jumpDirection // on either side, pretend a wall behind us
+				: hasLeft ? left // or else jumping along
+				: hasRight ? right
+				: null;
+			if (result != null) {
+				return new Pair<>(new Vec3d(jumpDirection.getUnitVector()), result);
+			}
+
 			return null;
 		}
 	}
