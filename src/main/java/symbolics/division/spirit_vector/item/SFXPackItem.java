@@ -7,21 +7,21 @@ import net.minecraft.text.Text;
 import symbolics.division.spirit_vector.sfx.SFXPack;
 
 public class SFXPackItem extends Item {
-    public SFXPackItem(RegistryEntry<SFXPack<?>> entry) {
-        super(new Item.Settings().component(SFXPack.COMPONENT, entry));
-    }
+	public SFXPackItem(RegistryEntry<SFXPack<?>> entry) {
+		super(new Item.Settings().component(SFXPack.COMPONENT, entry).maxCount(1));
+	}
 
-    @Override
-    public Text getName(ItemStack stack) {
-        return applySFXToText(stack, this, super.getName(stack));
-    }
+	@Override
+	public Text getName(ItemStack stack) {
+		return applySFXToText(stack, this, super.getName(stack));
+	}
 
-    public static Text applySFXToText(ItemStack stack, Item item, Text text) {
-        var sfx = stack.get(SFXPack.COMPONENT);
-        if (sfx != null) {
-            int color = sfx.value().color();
-            text = text.copy().withColor(color);
-        }
-        return text;
-    }
+	public static Text applySFXToText(ItemStack stack, Item item, Text text) {
+		var sfx = stack.get(SFXPack.COMPONENT);
+		if (sfx != null) {
+			int color = sfx.value().color();
+			text = text.copy().withColor(color);
+		}
+		return text;
+	}
 }

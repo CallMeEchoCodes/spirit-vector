@@ -5,11 +5,10 @@ import net.minecraft.client.sound.MovingSoundInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 
 public class SpellDimensionSoundInstance extends MovingSoundInstance {
 	public static boolean shouldPlayFor(PlayerEntity player) {
-		return SpellDimension.SPELL_DIMENSION.isCasting() && MinecraftClient.getInstance().player == player;
+		return MinecraftClient.getInstance().player == player && player.getWorld().spellDimension().isCasting();
 	}
 
 	private final PlayerEntity player;

@@ -2,12 +2,12 @@ package symbolics.division.spirit_vector.logic.spell;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.GrassBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.GrassColors;
 import symbolics.division.spirit_vector.SpiritVectorBlocks;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 
@@ -21,37 +21,38 @@ public class SpellDimension {
 	// since Materia only exists clientside, we don't need to worry
 	// about persistence between sessions.
 
-	public static final SpellDimension SPELL_DIMENSION = new SpellDimension();
-
-	private static Consumer<Spell> spellCallback = s -> {};
+	private static Consumer<Spell> spellCallback = s -> {
+	};
 	public static final int EIDOS_PER_TICK = 40;
+	private static final boolean DEDICATED_SERVER = FabricLoader.getInstance().getEnvironmentType().equals(EnvType.SERVER);
 
 	public static void setSpellCallback(Consumer<Spell> spellConsumer) {
 		spellCallback = spellConsumer;
 	}
 
-	public static void cast(Spell spell) {
-		SPELL_DIMENSION.activeSpells.add(spell);
-		spellCallback.accept(spell);
-	}
-
-	public static void worldTick(World world) {
-		SPELL_DIMENSION.tick(world);
-	}
-
+	private final World world;
 	private final List<Spell> activeSpells = new ArrayList<>();
 	private final Map<Pair<World, BlockPos>, EidosInfo> eidosTracker = new Object2ObjectLinkedOpenHashMap<>();
 
-	public void tick(World world) {
-		// client side only in singleplayer
-		if (world.isClient) {
-			List<Spell> toTick = List.copyOf(activeSpells);
-			for (Spell spell : toTick) {
-				if (spell.ticksLeft() <= 0) {
-					activeSpells.remove(spell);
-				} else {
-					spell.tick(this);
-				}
+	public SpellDimension(World world) {
+		this.world = world;
+	}
+
+	public void cast(Spell spell) {
+		activeSpells.add(spell);
+		spellCallback.accept(spell);
+	}
+
+	public void tick() {
+		if (!(world.isClient || SpiritVectorMod.PHYSICAL_SERVER)) {
+			throw new RuntimeException("Integrated server spell dimension must never be ticked.");
+		}
+		List<Spell> toTick = List.copyOf(activeSpells);
+		for (Spell spell : toTick) {
+			if (spell.cancelled()) {
+				activeSpells.remove(spell);
+			} else {
+				spell.tick(this);
 			}
 		}
 		this.cullEidos(world);
@@ -71,38 +72,32 @@ public class SpellDimension {
 	private void cullEidos(World world) {
 		List<Pair<World, BlockPos>> toRemove = new ArrayList<>();
 		int removed = EIDOS_PER_TICK;
-		synchronized (eidosTracker) { // lazy (programmer) singleplayer solution
-			for (var entry : eidosTracker.entrySet()) {
-				if (entry.getKey() == null) {
-					SpiritVectorMod.LOGGER.error("KEY IS NULL FIX ME");
-					continue;
-				}
-				if (!entry.getKey().getFirst().equals(world)) continue;
-				if (removed <= 0) break;
-				if (entry.getValue().tick()) {
-					removed--;
-					toRemove.add(entry.getKey());
-					BlockPos pos = entry.getKey().getSecond();
-					EidosInfo info = entry.getValue();
-					for (BlockPos blockPos : BlockPos.iterate(
-						pos.getX() - info.size,
-						pos.getY() - info.size,
-						pos.getZ() - info.size,
-						pos.getX() + info.size,
-						pos.getY() + info.size,
-						pos.getZ() + info.size)) {
-						if (SpiritVectorBlocks.Materia.removable(world.getBlockState(blockPos), !world.isClient)) {
-							world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
-						}
+		for (var entry : eidosTracker.entrySet()) {
+			if (entry.getKey() == null) {
+				SpiritVectorMod.LOGGER.error("KEY IS NULL FIX ME");
+				continue;
+			}
+			if (!entry.getKey().getFirst().equals(world)) continue;
+			if (removed <= 0) break;
+			if (entry.getValue().tick()) {
+				removed--;
+				toRemove.add(entry.getKey());
+				BlockPos pos = entry.getKey().getSecond();
+				EidosInfo info = entry.getValue();
+				for (BlockPos blockPos : BlockPos.iterate(
+					pos.getX() - info.size,
+					pos.getY() - info.size,
+					pos.getZ() - info.size,
+					pos.getX() + info.size,
+					pos.getY() + info.size,
+					pos.getZ() + info.size)) {
+					if (SpiritVectorBlocks.Materia.removable(world.getBlockState(blockPos), !world.isClient)) {
+						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 					}
 				}
 			}
-			for (var key : toRemove) eidosTracker.remove(key);
 		}
-	}
-
-	public void clearEidos() {
-		eidosTracker.clear();
+		for (var key : toRemove) eidosTracker.remove(key);
 	}
 
 	public boolean isCasting() {

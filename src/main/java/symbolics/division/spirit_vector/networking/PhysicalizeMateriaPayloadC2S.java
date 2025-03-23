@@ -11,8 +11,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import symbolics.division.spirit_vector.SpiritVectorBlocks;
 import symbolics.division.spirit_vector.SpiritVectorMod;
-import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
 import java.util.List;
@@ -26,19 +24,22 @@ public record PhysicalizeMateriaPayloadC2S(int ticksLeft, List<BlockPos> blocks)
 		);
 
 	@Override
-	public Id<? extends CustomPayload> getId() { return ID; }
+	public Id<? extends CustomPayload> getId() {
+		return ID;
+	}
 
-	public static void HANDLER (PhysicalizeMateriaPayloadC2S payload, ServerPlayNetworking.Context context) {
- 		PlayerEntity player = context.player();
+	public static void HANDLER(PhysicalizeMateriaPayloadC2S payload, ServerPlayNetworking.Context context) {
+		if (!SpiritVectorMod.PHYSICAL_SERVER) return;
+		PlayerEntity player = context.player();
 		if (SpiritVector.hasEquipped(player)) {
 			World world = player.getWorld();
 			int size = 1;
 			BlockPos bp = player.getBlockPos();
 			for (BlockPos pos : payload.blocks) {
 				world.setBlockState(pos, SpiritVectorBlocks.MATERIA.getDefaultState().with(SpiritVectorBlocks.REAL, true), Block.NOTIFY_LISTENERS);
-				size = (int)Math.ceil(Math.max(size, MathHelper.sqrt((float)bp.getSquaredDistance(pos))));
+				size = (int) Math.ceil(Math.max(size, MathHelper.sqrt((float) bp.getSquaredDistance(pos))));
 			}
-			SpellDimension.SPELL_DIMENSION.eidosPlaced(world, bp, size, payload.ticksLeft);
+			player.getWorld().spellDimension().eidosPlaced(world, bp, size, payload.ticksLeft);
 		}
 	}
 }

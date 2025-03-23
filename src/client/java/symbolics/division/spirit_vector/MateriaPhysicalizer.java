@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.networking.PhysicalizeMateriaPayloadC2S;
 
@@ -18,10 +17,10 @@ public class MateriaPhysicalizer {
 		if (player == null ||
 			!player.isAlive() ||
 			!SpiritVector.hasEquipped(player) ||
-			!SpellDimension.SPELL_DIMENSION.isCasting()
+			!player.getWorld().spellDimension().isCasting()
 		) return;
 
-		Box bb = player.getBoundingBox().expand(1);
+		Box bb = player.getBoundingBox().expand(2);
 		List<BlockPos> toSend = new ArrayList<>();
 		for (BlockPos bp : BlockPos.iterate(BlockPos.ofFloored(bb.getMinPos()), BlockPos.ofFloored(bb.getMaxPos()))) {
 			if (player.getWorld().testBlockState(bp, state -> state.isOf(SpiritVectorBlocks.MATERIA))) {
@@ -30,7 +29,7 @@ public class MateriaPhysicalizer {
 		}
 
 		if (!toSend.isEmpty()) {
-			int ticksLeft = SpellDimension.SPELL_DIMENSION.ticksLeft();
+			int ticksLeft = player.getWorld().spellDimension().ticksLeft();
 			if (ticksLeft > 0) ClientPlayNetworking.send(new PhysicalizeMateriaPayloadC2S(ticksLeft, toSend));
 		}
 	}

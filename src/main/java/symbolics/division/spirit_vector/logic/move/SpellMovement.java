@@ -4,12 +4,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
+import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.input.ArrowManager;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
-import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.spell.Spell;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
@@ -34,18 +33,18 @@ public class SpellMovement extends NeutralMovement {
 	public boolean testMovementCondition(SpiritVector sv, TravelMovementContext ctx) {
 		InputManager input = sv.inputManager();
 		if (
-			!SpellDimension.SPELL_DIMENSION.isCasting() &&
-			!sv.user.isOnGround() &&
-			sv.getMomentum() >= SpiritVector.MAX_MOMENTUM * 0.9 &&
-			input.pressed(Input.CROUCH) &&
-			input.pressed(Input.SPRINT) &&
-			input.pressed(Input.JUMP)
+			!sv.user.getWorld().spellDimension().isCasting() &&
+				!sv.user.isOnGround() &&
+				sv.getMomentum() >= SpiritVector.MAX_MOMENTUM * 0.9 &&
+				input.pressed(Input.CROUCH) &&
+				input.pressed(Input.SPRINT) &&
+				input.pressed(Input.JUMP)
 		) {
 			sv.setMomentum(0);
 			input.consume(Input.CROUCH);
 			input.consume(Input.SPRINT);
 			input.consume(Input.JUMP);
-			((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
+			((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
 			sv.arrowManager().consumeAll();
 			sv.stateManager().enableStateFor(CASTING_STATE_ID, MAX_CASTING_TICKS);
 			SpellFXEvents.activateRuneMatrix();
@@ -65,13 +64,13 @@ public class SpellMovement extends NeutralMovement {
 		sv.user.setVelocity(
 			MovementUtils.augmentedInput(sv, ctx).multiply(0.6).add(0, 0.5, 0)
 		);
-		((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
+		((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).resetInputs();
 	}
 
 	@Override
 	public void travel(SpiritVector sv, TravelMovementContext ctx) {
 		if (sv.inputManager().consume(Input.JUMP)) {
-			SpellDimension.cast(new Spell(sv, ((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).eigenCode()));
+			sv.user.getWorld().spellDimension().cast(new Spell(sv, ((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).eigenCode()));
 			sv.stateManager().clearTicks(CASTING_STATE_ID);
 		}
 		SlideMovement.travelWithInput(sv, Vec3d.ZERO);
@@ -79,7 +78,7 @@ public class SpellMovement extends NeutralMovement {
 	}
 
 	public static List<Arrow> getCurrentEigenCode(SpiritVector sv) {
-		return List.copyOf(((SpellcastingState)sv.stateManager().getState(CASTING_STATE_ID)).eigenCode());
+		return List.copyOf(((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).eigenCode());
 	}
 
 	private static class SpellcastingState extends ManagedState {

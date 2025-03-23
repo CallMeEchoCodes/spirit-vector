@@ -1,14 +1,12 @@
 package symbolics.division.spirit_vector.logic.spell;
 
+import it.unimi.dsi.fastutil.PriorityQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayPriorityQueue;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import it.unimi.dsi.fastutil.PriorityQueue;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
@@ -39,7 +37,9 @@ public class Spell {
 	private final SpiritVector sv;
 	private final PriorityQueue<BlockPos> anchors;
 	private final BlockPos center;
-	private Consumer<BlockPos> placementCallback = b -> {};
+	private boolean cancelled = false;
+	private Consumer<BlockPos> placementCallback = b -> {
+	};
 
 	public Spell(SpiritVector sv, List<Arrow> eigenCode) {
 		this.sv = sv;
@@ -47,13 +47,13 @@ public class Spell {
 		for (Arrow a : eigenCode) code.append(a.sym);
 		String unique = code.toString().replaceAll("(.)(?=.*?\\1)", "");
 
-		this.complexity = (float)(Math.min(eigenCode.size(), 8) + unique.length()) / (float)(8 + 4);
+		this.complexity = (float) (Math.min(eigenCode.size(), 8) + unique.length()) / (float) (8 + 4);
 		// base 0.9 is ideal for sky runes
-		this.decay= 0.9f * (1f - complexity);
+		this.decay = 0.9f * (1f - complexity);
 		this.core = makeCore(eigenCode);
 
-		this.maxSpellRadius = (int)(MIN_SPELL_DIMENSION_RADIUS + (MAX_SPELL_DIMENSION_RADIUS - MIN_SPELL_DIMENSION_RADIUS) * complexity);
-		this.ticksLeft = (int)(MIN_SPELL_TICKS + (MAX_SPELL_TICKS - MIN_SPELL_TICKS) * complexity);
+		this.maxSpellRadius = (int) (MIN_SPELL_DIMENSION_RADIUS + (MAX_SPELL_DIMENSION_RADIUS - MIN_SPELL_DIMENSION_RADIUS) * complexity);
+		this.ticksLeft = (int) (MIN_SPELL_TICKS + (MAX_SPELL_TICKS - MIN_SPELL_TICKS) * complexity);
 		SpiritVectorMod.LOGGER.debug("casting spell: " + code);
 		SpiritVectorMod.LOGGER.debug("radius: " + this.maxSpellRadius);
 		SpiritVectorMod.LOGGER.debug("complexity: " + complexity);
@@ -68,9 +68,9 @@ public class Spell {
 			this.anchors = new ObjectArrayPriorityQueue<>((a1, a2) -> Integer.compare(a1.getManhattanDistance(center), a2.getManhattanDistance(center)));
 		}
 
-		for (int x = -(int)maxSpellRadius; x < maxSpellRadius; x++) {
-			for (int y = -(int)maxSpellRadius; y < maxSpellRadius; y++) {
-				for (int z = -(int)maxSpellRadius; z < maxSpellRadius; z++) {
+		for (int x = -(int) maxSpellRadius; x < maxSpellRadius; x++) {
+			for (int y = -(int) maxSpellRadius; y < maxSpellRadius; y++) {
+				for (int z = -(int) maxSpellRadius; z < maxSpellRadius; z++) {
 					if (x % EIDOS_SPACING_HORIZONTAL == 0 && z % EIDOS_SPACING_HORIZONTAL == 0 && y % EIDOS_SPACING_VERTICAL == 0) {
 						anchors.enqueue(new BlockPos(center.getX() + x, center.getY() + y, center.getZ() + z));
 					}
@@ -85,12 +85,16 @@ public class Spell {
 			!SpiritVector.hasEquipped(sv.user)
 		) {
 			ticksLeft = 0;
+			cancelled = true;
 			return;
 		}
 
 		ticksLeft--;
-		if (ticksLeft < 0 || anchors.isEmpty()) return;
-		
+		if (ticksLeft < 0 || anchors.isEmpty()) {
+			cancelled = true;
+			return;
+		}
+
 		spellRadius++;
 		// creates an octahedron
 		if (sv.is(VectorType.BURST) && spellRadius > maxSpellRadius) return;
@@ -117,6 +121,10 @@ public class Spell {
 		return ticksLeft;
 	}
 
+	public boolean cancelled() {
+		return cancelled;
+	}
+
 	private Eidos makeCore(List<Arrow> eigenCode) {
 		Map<Arrow, EidosEdge> edges = new TreeMap<>();
 		edges.put(Arrow.RIGHT, new EidosEdge(3, 0, 1, 0));
@@ -134,9 +142,9 @@ public class Spell {
 			}
 		}
 
-		for (int i = 0; i+1 < eigenCode.size(); i += 2) {
+		for (int i = 0; i + 1 < eigenCode.size(); i += 2) {
 			Arrow side = eigenCode.get(i);
-			Arrow action = eigenCode.get(i+1);
+			Arrow action = eigenCode.get(i + 1);
 			switch (action) {
 				case UP -> edges.get(side).extrudeUp(core);
 				case DOWN -> edges.get(side).extrudeDown(core);

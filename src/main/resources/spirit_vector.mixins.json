@@ -10,6 +10,7 @@
 		"PlayerEntityMixin",
 		"ServerPlayerEntityMixin",
 		"ServerPlayNetworkHandlerMixin",
+		"WorldSpellDimensionInjection",
 		"sound.JukeboxSongMixin"
 	],
 	"injectors": {

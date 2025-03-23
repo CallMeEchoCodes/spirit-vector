@@ -1,12 +1,13 @@
 package symbolics.division.spirit_vector;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -18,7 +19,6 @@ import symbolics.division.spirit_vector.compat.ModCompatibility;
 import symbolics.division.spirit_vector.logic.SVEntityState;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
 import symbolics.division.spirit_vector.networking.OpenRMConfigRequestPayloadC2S;
 import symbolics.division.spirit_vector.networking.PhysicalizeMateriaPayloadC2S;
@@ -37,6 +37,8 @@ public final class SpiritVectorMod implements ModInitializer {
 	public static <T extends CustomPayload> CustomPayload.Id<T> payloadId(String identififer) {
 		return new CustomPayload.Id<>(id(identififer));
 	}
+
+	public static boolean PHYSICAL_SERVER = FabricLoader.getInstance().getEnvironmentType().equals(EnvType.SERVER);
 
 	@Override
 	public void onInitialize() {
@@ -64,8 +66,9 @@ public final class SpiritVectorMod implements ModInitializer {
 		PayloadTypeRegistry.playS2C().register(PhysicalizeMateriaPayloadC2S.ID, PhysicalizeMateriaPayloadC2S.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(PhysicalizeMateriaPayloadC2S.ID, PhysicalizeMateriaPayloadC2S::HANDLER);
 
-		ServerTickEvents.START_WORLD_TICK.register(SpellDimension::worldTick);
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> SpellDimension.SPELL_DIMENSION.clearEidos());
+		if (PHYSICAL_SERVER) {
+			ServerTickEvents.START_WORLD_TICK.register(w -> w.spellDimension().tick());
+		}
 
 		// hoping this covers all cases where players should be updated on wing state
 		// TODO doesn't seem to work, figure out during integration with larger sample size

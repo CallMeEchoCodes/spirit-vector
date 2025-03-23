@@ -42,5 +42,12 @@
 		"fabric-datagen": [
 			"symbolics.division.spirit_vector.SpiritVectorDataGenerator"
 		]
+	},
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/class_1937": [
+				"symbolics/division/spirit_vector/logic/spell/SpellDimensionHaver"
+			]
+		}
 	}
 }

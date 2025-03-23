@@ -2,7 +2,6 @@ package symbolics.division.spirit_vector;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
@@ -10,23 +9,19 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.network.packet.s2c.play.ExperienceBarUpdateS2CPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import symbolics.division.spirit_vector.event.JukeboxEvent;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.SVEntityState;
+import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
+import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
 import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
-import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
-import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
 import symbolics.division.spirit_vector.networking.OpenRMConfigRequestPayloadC2S;
 import symbolics.division.spirit_vector.render.SpellDimensionRenderer;
@@ -53,12 +48,12 @@ public class SpiritVectorClient implements ClientModInitializer {
 //		);
 
 		ClientPlayNetworking.registerGlobalReceiver(
-				SVEntityState.Payload.ID, (payload, context) -> SVEntityState.handleStateSync(payload, context.player().getWorld())
+			SVEntityState.Payload.ID, (payload, context) -> SVEntityState.handleStateSync(payload, context.player().getWorld())
 		);
 
 		ClientPlayNetworking.registerGlobalReceiver(
-				ModifyMomentumPayloadS2C.ID,
-				((payload, context) -> ModifyMomentumPayloadS2C.HANDLER(payload, context.player()))
+			ModifyMomentumPayloadS2C.ID,
+			((payload, context) -> ModifyMomentumPayloadS2C.HANDLER(payload, context.player()))
 		);
 
 		// spirit wings reg
@@ -82,12 +77,12 @@ public class SpiritVectorClient implements ClientModInitializer {
 
 		// teleport ability req
 		TeleportAbilityC2SPayload.registerRequestCallback(
-				p -> ClientPlayNetworking.send(new TeleportAbilityC2SPayload(p))
+			p -> ClientPlayNetworking.send(new TeleportAbilityC2SPayload(p))
 		);
 
 		// space jam
 		SlamPacketC2S.registerRequestCallback(
-				p -> ClientPlayNetworking.send(new SlamPacketC2S((p)))
+			p -> ClientPlayNetworking.send(new SlamPacketC2S((p)))
 		);
 
 		HudRenderCallback.EVENT.register(SpiritGaugeHUD::onHudRender);
@@ -102,10 +97,10 @@ public class SpiritVectorClient implements ClientModInitializer {
 			}
 		}));
 
-		HandledScreens.register(RuneMatrixScreenHandler.RUNE_MATRIX,  RuneMatrixScreen::new);
+		HandledScreens.register(RuneMatrixScreenHandler.RUNE_MATRIX, RuneMatrixScreen::new);
 
 		SpellDimension.setSpellCallback(SpellDimensionRenderer.SDR::configureSpell);
-		ClientTickEvents.START_WORLD_TICK.register(SpellDimension::worldTick);
+		ClientTickEvents.START_WORLD_TICK.register(w -> w.spellDimension().tick());
 
 		SpiritVector.colorCallback = SpellDimensionRenderer::setMateriaColor;
 		BlockRenderLayerMap.INSTANCE.putBlock(SpiritVectorBlocks.MATERIA, RenderLayer.getTranslucent());
@@ -115,7 +110,7 @@ public class SpiritVectorClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(w -> MateriaPhysicalizer.tick());
 
-		SpiritVector.configCallback = ()  -> {
+		SpiritVector.configCallback = () -> {
 			ClientPlayNetworking.send(new OpenRMConfigRequestPayloadC2S());
 		};
 	}

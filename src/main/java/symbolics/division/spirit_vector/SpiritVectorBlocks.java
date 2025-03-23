@@ -19,7 +19,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
 public class SpiritVectorBlocks {
@@ -38,14 +37,14 @@ public class SpiritVectorBlocks {
 
 		@Override
 		public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-			if (!SpellDimension.SPELL_DIMENSION.isCasting() && !state.get(REAL)) {
+			if (!state.get(REAL) && !world.spellDimension().isCasting()) {
 				world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 			}
 		}
 
 		@Override
 		protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-			if (!SpellDimension.SPELL_DIMENSION.isCasting() && state.get(REAL)) {
+			if (state.get(REAL) && world.spellDimension().isCasting()) {
 				world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 			}
 		}
