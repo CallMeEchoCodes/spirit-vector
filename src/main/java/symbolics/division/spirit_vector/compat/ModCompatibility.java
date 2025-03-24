@@ -9,7 +9,7 @@ public interface ModCompatibility {
 
 	void initialize(String modid, boolean inDev);
 
-	String COMPAT_PACKAGE_PREFIX = "symbolics.division.spirit.vector.compat.";
+	String COMPAT_PACKAGE_PREFIX = "symbolics.division.spirit_vector.compat.";
 
 	private static void tryInit(String compatClass, String modRef) {
 		var loader = FabricLoader.getInstance();
@@ -49,7 +49,7 @@ public interface ModCompatibility {
 	}
 
 	static void alertRuntimeCompatBroken(String modid) {
-		SpiritVectorMod.LOGGER.error("Mod " + modid + " probably had an API change not caught " +
+		SpiritVectorMod.LOGGER.error("Mod " + modid + " likely had an API change not caught " +
 			"in the compatibility loading step. If you are using the latest version of both, " +
 			"please report to the author of " + SpiritVectorMod.MODID + ".");
 	}
@@ -57,5 +57,6 @@ public interface ModCompatibility {
 	static void init() {
 		SpiritVectorMod.LOGGER.debug("Loading " + SpiritVectorMod.MODID + " mod compatibilities");
 		tryInit("DancerizerCompat", "dancerizer");
+		tryInit("ZiplineCompat", "zipline");
 	}
 }

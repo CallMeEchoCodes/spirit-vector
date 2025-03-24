@@ -22,6 +22,7 @@ dependencies {
 	modImplementation libs.fapi
 
 	modCompileOnly libs.dancerizer
+	modImplementation libs.zipline
 }
 
 loom {
@@ -58,6 +59,7 @@ processResources {
 		fl            : libs.versions.fl.get(),
 		fapi          : libs.versions.fapi.get(),
 		dancerizer    : libs.versions.dancerizer.get(),
+		zipline       : libs.versions.zipline.get(),
 	]
 	inputs.properties(meta)
 	filesMatching("*.mod.json") { expand(meta) }
@@ -106,6 +108,7 @@ modrinth {
 	dependencies {
 		required.version libs.fapi.get().getName(), libs.versions.fapi.get()
 		optional.version libs.dancerizer.get().getName(), libs.versions.dancerizer.get()
+		optional.version libs.zipline.get().getName(), libs.versions.zipline.get()
 	}
 }
 

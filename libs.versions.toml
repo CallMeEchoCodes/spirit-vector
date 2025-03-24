@@ -3,12 +3,13 @@ loom = "1.7.+"
 githubRelease = "2.4.1"
 minotaur = "2.+"
 
-mc = "1.21"
-fl = "0.15.11"
+mc = "1.21.1"
+fl = "0.16.10"
 yarn = "1.21+build.9"
-fapi = "0.102.0+1.21"
+fapi = "0.115.3+1.21.1"
 
 dancerizer = "1.1.0"
+zipline = "1.2.0+1.21.1"
 
 [plugins]
 loom = { id = "fabric-loom", version.ref = "loom" }
@@ -22,3 +23,4 @@ yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
 fapi = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fapi" }
 
 dancerizer = { group = "maven.modrinth", name = "dancerizer", version.ref = "dancerizer" }
+zipline = { group = "maven.modrinth", name = "zipline", version.ref = "zipline" }

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import symbolics.division.spirit_vector.SpiritVectorItems;
 import symbolics.division.spirit_vector.SpiritVectorMod;
+import symbolics.division.spirit_vector.api.SpiritVectorApi;
 import symbolics.division.spirit_vector.logic.SVEntityState;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
@@ -38,6 +39,8 @@ import symbolics.division.spirit_vector.logic.state.WingsEffectState;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXPack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -88,7 +91,7 @@ public class SpiritVector {
 	protected final VectorType type;
 
 	// these are checked in order prior to rune movements
-	protected final MovementType[] movements = {
+	protected final MovementType[] baseMovements = {
 		MovementType.SPELL,
 		MovementType.VAULT,
 		MovementType.JUMP,
@@ -97,6 +100,8 @@ public class SpiritVector {
 		MovementType.WALL_JUMP,
 		MovementType.WALL_RUSH
 	};
+
+	protected final MovementType[] movements;
 
 	public SpiritVector(LivingEntity user, ItemStack itemStack) {
 		this(user, itemStack, VectorType.SPIRIT);
@@ -112,6 +117,15 @@ public class SpiritVector {
 		stateManager.register(WingsEffectState.ID, new WingsEffectState(this));
 		stateManager.register(MODIFY_MOMENTUM_COOLDOWN_STATE, new ManagedState(this));
 		stateManager.register(MOMENTUM_DECAY_GRACE_STATE, new ManagedState(this));
+
+		List<MovementType> combinedMovements = new ArrayList<>();
+		for (MovementType baseMovement : baseMovements) {
+			combinedMovements.addAll(SpiritVectorApi.getRegisteredMovements(baseMovement, SpiritVectorApi.MovementOrder.BEFORE));
+			combinedMovements.add(baseMovement);
+			combinedMovements.addAll(SpiritVectorApi.getRegisteredMovements(baseMovement, SpiritVectorApi.MovementOrder.AFTER));
+		}
+
+		this.movements = combinedMovements.toArray(MovementType[]::new);
 
 		for (MovementType move : movements) {
 			move.configure(this);
