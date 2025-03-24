@@ -6,6 +6,7 @@ import dev.doublekekse.zipline.registry.ZiplineSoundEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import symbolics.division.spirit_vector.SpiritVectorMod;
@@ -53,7 +54,12 @@ public class ZiplineCompat implements ModCompatibility {
 						Vec3d point = cable.getClosestPoint(sv.user.getPos());
 						if (validPosition(sv.user, point)) {
 							ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
-							grindState.setup(cable, MovementUtils.augmentedInput(sv, ctx), point);
+							grindState.setup(
+								cable,
+								MovementUtils.augmentedInput(sv, ctx),
+								point,
+								sv.user.getVelocity().withAxis(Direction.Axis.Y, 0).length()
+							);
 							grindState.enable();
 							sv.inputManager().consume(Input.CROUCH);
 							sv.user.playSound(ZiplineSoundEvents.ZIPLINE_ATTACH, 0.4f, 2);
@@ -71,9 +77,11 @@ public class ZiplineCompat implements ModCompatibility {
 
 		@Override
 		public boolean testMovementCompleted(SpiritVector sv, TravelMovementContext ctx) {
+			ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
 			if (sv.inputManager().consume(Input.JUMP)) {
+				double jump = MathHelper.clamp(grindState.speed, 0.6, 1);
 				sv.user.setVelocity(
-					MovementUtils.augmentedInput(sv, ctx).multiply(sv.user.getVelocity().length()).add(0, 0.5, 0)
+					MovementUtils.augmentedInput(sv, ctx).multiply(grindState.speed).add(0, jump, 0)
 				);
 				sv.effectsManager().spawnRing(sv.user.getPos(), Vec3d.ZERO);
 				return true;
@@ -95,12 +103,12 @@ public class ZiplineCompat implements ModCompatibility {
 			ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
 			double MAX_TURN_ANGLE = 0.707;
 
-			double speed = sv.user.getVelocity().length();
-			if (speed < 1.6) {
-				speed = MathHelper.lerp(0.03, speed, 1.6);
+			double MIN_SPEED = 0.8;
+			if (grindState.speed < MIN_SPEED) {
+				grindState.speed = MathHelper.lerp(0.03, grindState.speed, MIN_SPEED);
 			}
 
-			grindState.progress += grindState.direction * speed / grindState.cable.length();
+			grindState.progress += grindState.direction * grindState.speed / grindState.cable.length();
 			Vec3d nextPoint = grindState.cable.getPoint(grindState.progress);
 			Vec3d cableDelta = nextPoint.subtract(sv.user.getPos());
 			Vec3d cableDir = cableDelta.normalize();
@@ -111,8 +119,8 @@ public class ZiplineCompat implements ModCompatibility {
 			}
 
 			sv.user.setPosition(nextPoint);
-//			sv.user.setVelocity(0, 0, 0);
-			sv.user.playSound(ZiplineSoundEvents.ZIPLINE_USE, 1, .7f + (float) speed);
+			sv.user.setVelocity(grindState.cable.direction(grindState.progress).multiply(grindState.speed * grindState.direction));
+			sv.user.playSound(ZiplineSoundEvents.ZIPLINE_USE, 1, .7f + (float) grindState.speed);
 
 			if (grindState.progress >= 1 || grindState.progress <= 0) {
 				Collection<Cable> nextCandidates = grindState.cable.getNext(grindState.direction == 1);
@@ -173,12 +181,14 @@ public class ZiplineCompat implements ModCompatibility {
 		public double progress = 0;
 		public Vec3d point = Vec3d.ZERO;
 		public double direction = 1;
+		public double speed;
 
-		public void setup(Cable cable, Vec3d input, Vec3d point) {
+		public void setup(Cable cable, Vec3d input, Vec3d point, double speed) {
 			this.cable = cable;
 			this.progress = cable.getProgress(point);
 			this.point = point;
 			this.direction = input.multiply(1, 0, 1).normalize().dotProduct(this.cable.direction(progress)) >= 0 ? 1 : -1;
+			this.speed = speed;
 		}
 
 		public ZiplineGrindState(SpiritVector sv) {
