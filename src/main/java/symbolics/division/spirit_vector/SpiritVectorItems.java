@@ -63,7 +63,7 @@ public final class SpiritVectorItems {
 
     static {
         for (SimpleSFX pack : SpiritVectorSFX.getSimpleSFX()) {
-            sfxUpgradeItems.add(registerAndModel("anima_core_" + pack.id.getPath(), pack.asItem()));
+            sfxUpgradeItems.add(registerAndModel("anima_core_" + pack.id().getPath(), pack.asItem()));
         }
     }
 

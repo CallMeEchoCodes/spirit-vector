@@ -17,6 +17,7 @@ import symbolics.division.spirit_vector.registry.SpiritVectorRegistration;
 import java.util.UUID;
 
 public interface SFXPack<T extends ParticleEffect> {
+    Identifier id();
     Identifier wingsTexture();
     ParticleType<T> particleType();
     T particleEffect();

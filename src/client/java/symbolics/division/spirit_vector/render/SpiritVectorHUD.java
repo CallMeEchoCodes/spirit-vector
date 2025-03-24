@@ -10,7 +10,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -19,7 +18,6 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import symbolics.division.spirit_vector.SpiritVectorMod;
-import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.ability.AbilitySlot;
 import symbolics.division.spirit_vector.logic.input.Arrow;
@@ -31,10 +29,6 @@ import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import java.util.List;
 
 public class SpiritVectorHUD {
-
-    private static final Identifier POISE_FULL_TEXTURE = SpiritVectorMod.id("hud/poise_full");
-	private static final Identifier WING_LEFT_TEXTURE = SpiritVectorMod.id("hud/wing_left");
-	private static final Identifier WING_RIGHT_TEXTURE = SpiritVectorMod.id("hud/wing_right");
 
 	public static final Identifier SLOT_LEFT = SpiritVectorMod.id("textures/gui/slot_indicator_left.png");
 	public static final Identifier SLOT_UP = SpiritVectorMod.id("textures/gui/slot_indicator_up.png");
@@ -69,9 +63,11 @@ public class SpiritVectorHUD {
         if (n <= 0) return;
 
         RenderSystem.enableBlend();
-        int POISE_TEXTURE_SIZE = 8;
+        int POISE_TEXTURE_SIZE = 16;
+        int POISE_RENDER_SIZE = 8;
+		Identifier poiseTexture = SpiritVectorMod.id("textures/item/anima_core_" + sv.getSFX().id().getPath() + ".png");
         for (int i = 0; i < n; i++) {
-            ctx.drawGuiTexture(POISE_FULL_TEXTURE, right-(POISE_TEXTURE_SIZE * (i + 1)), top, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE);
+            ctx.drawTexture(poiseTexture, right-(POISE_RENDER_SIZE * (i + 1)), top, POISE_RENDER_SIZE, POISE_RENDER_SIZE, 0, 0, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE);
         }
 
 		drawSlot(ctx, sv, SLOT_LEFT, AbilitySlot.LEFT, sv.getMomentum(), n, right-5, top - 15);
@@ -119,11 +115,13 @@ public class SpiritVectorHUD {
 		) {
 			SpiritVector sv = user.spiritVector();
 			if (sv == null) return;
-			int WING_TEXTURE_SIZE = 32;
+			int WING_TEXTURE_SIZE = 64;
+			int WING_RENDER_REGION = 32;
 
 			if (sv.isSoaring()) {
-				ctx.drawGuiTexture(WING_LEFT_TEXTURE, left + WING_TEXTURE_SIZE, top, WING_TEXTURE_SIZE, WING_TEXTURE_SIZE);
-				ctx.drawGuiTexture(WING_RIGHT_TEXTURE, right - WING_TEXTURE_SIZE * 2, top, WING_TEXTURE_SIZE, WING_TEXTURE_SIZE);
+				ctx.drawTexture(sv.getSFX().wingsTexture(), left + WING_RENDER_REGION, top, WING_RENDER_REGION, WING_RENDER_REGION, 0, 0, WING_RENDER_REGION, WING_RENDER_REGION, WING_TEXTURE_SIZE, WING_TEXTURE_SIZE);
+				// TODO: Flip the renderer horizontally
+				ctx.drawTexture(sv.getSFX().wingsTexture(), 0, 0, WING_RENDER_REGION, WING_RENDER_REGION, 0, 0, WING_RENDER_REGION, WING_RENDER_REGION, WING_TEXTURE_SIZE, WING_TEXTURE_SIZE);
 			}
 		}
 

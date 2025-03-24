@@ -6,39 +6,42 @@ import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.Identifier;
 import symbolics.division.spirit_vector.item.SFXPackItem;
 
-public class SimpleSFX implements SFXPack<SimpleParticleType> {
-    protected final SimpleParticleType PARTICLE_TYPE = FabricParticleTypes.simple();
-    protected final Identifier wingsTexture;
-    public final Identifier id;
-    protected final int color;
+public record SimpleSFX(Identifier id, int color, Identifier wingsTexture) implements SFXPack<SimpleParticleType> {
+	public static final SimpleParticleType PARTICLE_TYPE = FabricParticleTypes.simple();
 
-    public SimpleSFX(Identifier id) { this(id, 0xffffff); }
-    public SimpleSFX(Identifier id, int color) { this(id, color, "textures/wing/"); }
-    public SimpleSFX(Identifier id, int color, String wingTexturePath) {
-        this.wingsTexture = Identifier.of(id.getNamespace(),  wingTexturePath + id.getPath() + ".png");
-        this.id = id;
-        this.color = color;
-    }
+	public SimpleSFX(Identifier id) {
+		this(id, 0xffffff);
+	}
 
-    @Override
-    public Identifier wingsTexture() {
-        return wingsTexture;
-    }
+	public SimpleSFX(Identifier id, int color) {
+		this(id, color, "textures/wing/");
+	}
 
-    @Override
-    public SimpleParticleType particleType() {
-        return PARTICLE_TYPE;
-    }
+	public SimpleSFX(Identifier id, int color, String wingTexturePath) {
+		this(id, color, Identifier.of(id.getNamespace(), wingTexturePath + id.getPath() + ".png"));
+	}
 
-    @Override
-    public SimpleParticleType particleEffect() { return PARTICLE_TYPE; }
+	@Override
+	public Identifier wingsTexture() {
+		return wingsTexture;
+	}
 
-    @Override
-    public int color() {
-        return this.color;
-    }
+	@Override
+	public SimpleParticleType particleType() {
+		return PARTICLE_TYPE;
+	}
 
-    public Item asItem() {
-        return new SFXPackItem(SFXRegistry.INSTANCE.getEntry(this));
-    }
+	@Override
+	public SimpleParticleType particleEffect() {
+		return PARTICLE_TYPE;
+	}
+
+	@Override
+	public int color() {
+		return this.color;
+	}
+
+	public Item asItem() {
+		return new SFXPackItem(SFXRegistry.INSTANCE.getEntry(this));
+	}
 }
