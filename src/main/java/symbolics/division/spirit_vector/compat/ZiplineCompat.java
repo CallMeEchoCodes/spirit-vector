@@ -30,6 +30,7 @@ public class ZiplineCompat implements ModCompatibility {
 
 	private static class ZiplineGrindMovement extends AbstractMovementType {
 		private static final Identifier ZIP_CHECKED_STATE = SpiritVectorMod.id("compat.zipline_checked");
+		private static final Identifier SAME_CABLE_COOLDOWN = SpiritVectorMod.id("compat.zipline_same_cable");
 		private static final Identifier ZIP_GRIND_STATE = SpiritVectorMod.id("compat.zip_grind");
 
 		public ZiplineGrindMovement(Identifier id) {
@@ -39,38 +40,45 @@ public class ZiplineCompat implements ModCompatibility {
 		@Override
 		public void configure(SpiritVector sv) {
 			sv.stateManager().register(ZIP_CHECKED_STATE, new ManagedState(sv));
+			sv.stateManager().register(SAME_CABLE_COOLDOWN, new ManagedState(sv));
 			sv.stateManager().register(ZIP_GRIND_STATE, new ZiplineGrindState(sv));
 		}
 
 		@Override
 		public boolean testMovementCondition(SpiritVector sv, TravelMovementContext ctx) {
-			boolean checked = sv.stateManager().isActive(ZIP_CHECKED_STATE);
-			if (!sv.user.isOnGround()) { // if if if if
-				boolean pressed = sv.inputManager().pressed(Input.CROUCH);
-				if (pressed && !checked) { // try to do zipline
-					sv.stateManager().enableState(ZIP_CHECKED_STATE);
-					Cable cable = Cables.getClosestCable(sv.user.getPos(), 3);
-					if (cable != null) {
-						Vec3d point = cable.getClosestPoint(sv.user.getPos());
-						if (validPosition(sv.user, point)) {
-							ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
-							grindState.setup(
-								cable,
-								MovementUtils.augmentedInput(sv, ctx),
-								point,
-								sv.user.getVelocity().withAxis(Direction.Axis.Y, 0).length()
-							);
-							grindState.enable();
-							sv.inputManager().consume(Input.CROUCH);
-							sv.user.playSound(ZiplineSoundEvents.ZIPLINE_ATTACH, 0.4f, 2);
-							return true;
-						}
+			ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
+
+			if (sv.inputManager().released(Input.CROUCH)) {
+				sv.stateManager().clearTicks(SAME_CABLE_COOLDOWN);
+			}
+
+			if (sv.stateManager().isActive(ZIP_CHECKED_STATE)) {
+				return false;
+			}
+
+			if (!sv.user.isOnGround() && sv.inputManager().rawInput(Input.CROUCH)) {
+				Cable cable = Cables.getClosestCable(sv.user.getPos(), 3);
+				if (cable != null) {
+
+					// hack to guess if this is the last cable we were on
+					if (sv.stateManager().isActive(SAME_CABLE_COOLDOWN) && cable.getPoint(grindState.progress).equals(grindState.cable.getPoint(grindState.progress))) {
+						return false;
 					}
-				} else if (!pressed && checked) { // wait for next press
-					sv.stateManager().disableState(ZIP_CHECKED_STATE);
+
+					Vec3d point = cable.getClosestPoint(sv.user.getPos());
+					if (validPosition(sv.user, point)) {
+						grindState.setup(
+							cable,
+							MovementUtils.augmentedInput(sv, ctx),
+							point,
+							sv.user.getVelocity().withAxis(Direction.Axis.Y, 0).length()
+						);
+						grindState.enable();
+						sv.inputManager().consume(Input.CROUCH);
+						sv.user.playSound(ZiplineSoundEvents.ZIPLINE_ATTACH, 0.4f, 2);
+						return true;
+					}
 				}
-			} else if (checked) {
-				sv.stateManager().disableState(ZIP_CHECKED_STATE);
 			}
 			return false;
 		}
@@ -84,9 +92,20 @@ public class ZiplineCompat implements ModCompatibility {
 					MovementUtils.augmentedInput(sv, ctx).multiply(grindState.speed).add(0, jump, 0)
 				);
 				sv.effectsManager().spawnRing(sv.user.getPos(), Vec3d.ZERO);
+				sv.stateManager().enableStateFor(ZIP_CHECKED_STATE, 5);
 				return true;
 			}
-			return !sv.stateManager().isActive(ZIP_GRIND_STATE) || sv.inputManager().consume(Input.CROUCH);
+
+			if (!sv.inputManager().rawInput(Input.CROUCH)) {
+				sv.stateManager().enableStateFor(ZIP_CHECKED_STATE, 5);
+				return true;
+			}
+
+			if (!sv.stateManager().isActive(ZIP_GRIND_STATE)) {
+				sv.stateManager().enableStateFor(ZIP_CHECKED_STATE, 10);
+				return true;
+			}
+			return false;
 		}
 
 		@Override
@@ -94,6 +113,9 @@ public class ZiplineCompat implements ModCompatibility {
 			if (sv.stateManager().isActive(ZIP_GRIND_STATE)) {
 				sv.stateManager().disableState(ZIP_GRIND_STATE);
 			}
+
+			int COOLDOWN_TICKS = 15;
+			sv.stateManager().enableStateFor(SAME_CABLE_COOLDOWN, COOLDOWN_TICKS);
 		}
 
 		@Override
