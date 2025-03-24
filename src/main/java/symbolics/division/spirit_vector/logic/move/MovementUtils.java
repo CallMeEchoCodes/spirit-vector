@@ -1,20 +1,28 @@
 package symbolics.division.spirit_vector.logic.move;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import symbolics.division.spirit_vector.SpiritVectorBlocks;
+import symbolics.division.spirit_vector.SpiritVectorTags;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
 public final class MovementUtils {
+
+	public static boolean isSolidWall(World world, BlockPos wallPos, Direction dir, TagKey<Block> bypassTag) {
+		BlockState bp = world.getBlockState(wallPos);
+		return bp.isSideSolid(world, wallPos, dir, SideShapeType.RIGID) || bp.isIn(bypassTag);
+	}
+
 	public static boolean isSolidWall(World world, BlockPos wallPos, Direction dir) {
 		BlockState bp = world.getBlockState(wallPos);
-		return bp.isSideSolid(world, wallPos, dir, SideShapeType.RIGID) || bp.isOf(SpiritVectorBlocks.MATERIA);
+		return bp.isSideSolid(world, wallPos, dir, SideShapeType.RIGID);
 	}
 
 	@FunctionalInterface
@@ -48,10 +56,10 @@ public final class MovementUtils {
 	public static boolean validWallJumpAnchor(World world, Vec3d pos, Direction dir) {
 		BlockPos anchorPos = BlockPos.ofFloored(pos);
 		BlockPos wallPos = anchorPos.offset(dir);
-		return isSolidWall(world, wallPos, dir.getOpposite()) &&
-			(isSolidWall(world, wallPos.up(), dir.getOpposite()) && world.isAir(anchorPos.up()))
+		return isSolidWall(world, wallPos, dir.getOpposite(), SpiritVectorTags.Blocks.WALL_JUMPABLE) &&
+			(isSolidWall(world, wallPos.up(), dir.getOpposite(), SpiritVectorTags.Blocks.WALL_JUMPABLE) && world.isAir(anchorPos.up()))
 			||
-			(isSolidWall(world, wallPos.down(), dir.getOpposite()) && world.isAir(anchorPos.down()));
+			(isSolidWall(world, wallPos.down(), dir.getOpposite(), SpiritVectorTags.Blocks.WALL_JUMPABLE) && world.isAir(anchorPos.down()));
 
 	}
 
@@ -59,8 +67,8 @@ public final class MovementUtils {
 	public static boolean validWallRushAnchor(World world, Vec3d pos, Direction dir) {
 		BlockPos anchorPos = BlockPos.ofFloored(pos);
 		BlockPos wallPos = anchorPos.offset(dir);
-		return isSolidWall(world, wallPos, dir.getOpposite())
-			&& isSolidWall(world, wallPos.up(), dir.getOpposite())
+		return isSolidWall(world, wallPos, dir.getOpposite(), SpiritVectorTags.Blocks.WALL_RUSHABLE)
+			&& isSolidWall(world, wallPos.up(), dir.getOpposite(), SpiritVectorTags.Blocks.WALL_RUSHABLE)
 			&& world.isAir(anchorPos.up());
 	}
 

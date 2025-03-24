@@ -128,6 +128,12 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 				.addOptionalTag(BlockTags.FENCES)
 				.addOptionalTag(BlockTags.FENCE_GATES)
 				.addOptionalTag(BlockTags.WALLS);
+
+			getOrCreateTagBuilder(SpiritVectorTags.Blocks.WALL_JUMPABLE)
+				.add(SpiritVectorBlocks.MATERIA);
+
+			getOrCreateTagBuilder(SpiritVectorTags.Blocks.WALL_RUSHABLE)
+				.add(SpiritVectorBlocks.MATERIA);
 		}
 	}
 

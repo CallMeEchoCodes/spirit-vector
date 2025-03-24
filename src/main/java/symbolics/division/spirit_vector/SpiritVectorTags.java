@@ -11,33 +11,41 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
 public class SpiritVectorTags {
-    public static final class Items {
-        private static TagKey<Item> of(String name) { return ofRegistry(RegistryKeys.ITEM, name); }
+	public static final class Items {
+		private static TagKey<Item> of(String name) {
+			return ofRegistry(RegistryKeys.ITEM, name);
+		}
 
-        public static final TagKey<Item> SFX_PACK_TEMPLATES = of("sfx_upgrade_templates");
-        public static final TagKey<Item> SFX_PACK_ADDITIONS = of("sfx_upgrade_materials");
-        public static final TagKey<Item> SLOT_UPGRADE_RUNES = of("slot_upgrade_runes");
-        public static final TagKey<Item> ABILITY_UPGRADE_RUNES = of("ability_upgrade_runes");
+		public static final TagKey<Item> SFX_PACK_TEMPLATES = of("sfx_upgrade_templates");
+		public static final TagKey<Item> SFX_PACK_ADDITIONS = of("sfx_upgrade_materials");
+		public static final TagKey<Item> SLOT_UPGRADE_RUNES = of("slot_upgrade_runes");
+		public static final TagKey<Item> ABILITY_UPGRADE_RUNES = of("ability_upgrade_runes");
 
-        public static final TagKey<Item> SPIRIT_VECTOR_CRAFTING_MATERIALS = of("spirit_vector_crafting_materials");
-    }
-
-    public static final class Misc {
-        public static final TagKey<SoundEvent> JUKEBOX_LOOPING = ofRegistry(RegistryKeys.SOUND_EVENT, "jukebox_looping");
-    }
-
-	public static final class Blocks {
-		private static TagKey<Block> of(String name) { return ofRegistry(RegistryKeys.BLOCK, name); }
-		public static final TagKey<Block> RAIL_GRINDABLE = of("rail_grindable");
+		public static final TagKey<Item> SPIRIT_VECTOR_CRAFTING_MATERIALS = of("spirit_vector_crafting_materials");
 	}
 
-    private static <T> TagKey<T> ofRegistry(RegistryKey<? extends Registry<T>> key, String name) {
-        return TagKey.of(key, SpiritVectorMod.id(name));
-    }
+	public static final class Misc {
+		public static final TagKey<SoundEvent> JUKEBOX_LOOPING = ofRegistry(RegistryKeys.SOUND_EVENT, "jukebox_looping");
+	}
 
-    public static <T> TagKey<T> common(RegistryKey<Registry<T>> key, String id) {
-        return TagKey.of(key, Identifier.of(TagUtil.C_TAG_NAMESPACE, id));
-    }
+	public static final class Blocks {
+		private static TagKey<Block> of(String name) {
+			return ofRegistry(RegistryKeys.BLOCK, name);
+		}
 
-    public static void init(){}
+		public static final TagKey<Block> RAIL_GRINDABLE = of("rail_grindable");
+		public static final TagKey<Block> WALL_JUMPABLE = of("wall_jumpable");
+		public static final TagKey<Block> WALL_RUSHABLE = of("wall_rushable");
+	}
+
+	private static <T> TagKey<T> ofRegistry(RegistryKey<? extends Registry<T>> key, String name) {
+		return TagKey.of(key, SpiritVectorMod.id(name));
+	}
+
+	public static <T> TagKey<T> common(RegistryKey<Registry<T>> key, String id) {
+		return TagKey.of(key, Identifier.of(TagUtil.C_TAG_NAMESPACE, id));
+	}
+
+	public static void init() {
+	}
 }
