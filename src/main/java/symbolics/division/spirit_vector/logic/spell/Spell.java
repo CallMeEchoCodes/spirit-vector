@@ -45,9 +45,16 @@ public class Spell {
 		this.sv = sv;
 		StringBuilder code = new StringBuilder();
 		for (Arrow a : eigenCode) code.append(a.sym);
-		String unique = code.toString().replaceAll("(.)(?=.*?\\1)", "");
+		String str = code.toString();
+		String unique = str.replaceAll("(.)(?=.*?\\1)", "");
 
-		this.complexity = (float) (Math.min(eigenCode.size(), 8) + unique.length()) / (float) (8 + 4);
+		int vert = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i) == '↑' || str.charAt(i) == '↓') vert++;
+		}
+		if (vert != 0) vert++; // any verticality is good
+
+		this.complexity = (float) (Math.min(eigenCode.size(), 8) + unique.length() + vert) / (float) (8 + 4);
 		// base 0.9 is ideal for sky runes
 		this.decay = 0.9f * (1f - complexity);
 		this.core = makeCore(eigenCode);
