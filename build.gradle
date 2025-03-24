@@ -22,7 +22,7 @@ dependencies {
 	modImplementation libs.fapi
 
 	modCompileOnly libs.dancerizer
-	modImplementation libs.zipline
+	modCompileOnly libs.zipline
 }
 
 loom {
