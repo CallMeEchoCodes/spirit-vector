@@ -56,7 +56,7 @@ public interface ModCompatibility {
 
 	static void init() {
 		SpiritVectorMod.LOGGER.debug("Loading " + SpiritVectorMod.MODID + " mod compatibilities");
-		tryInit("DancerizerCompat", "dancerizer");
+//		tryInit("DancerizerCompat", "dancerizer");
 		tryInit("ZiplineCompat", "zipline");
 	}
 }
