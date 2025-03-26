@@ -57,7 +57,7 @@ public class ZiplineCompat implements ModCompatibility {
 			}
 
 			if (!sv.user.isOnGround() && sv.inputManager().rawInput(Input.CROUCH)) {
-				Cable cable = Cables.getClosestCable(sv.user.getPos(), 3);
+				Cable cable = Cables.getClosestCable(sv.user.getPos(), 2);
 				if (cable != null) {
 
 					// hack to guess if this is the last cable we were on
