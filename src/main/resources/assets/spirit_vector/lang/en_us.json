@@ -82,5 +82,8 @@
 	"jukebox_song.spirit_vector.cassette.sonic_bee.desc": "§fSupersonic Bee - Nulb",
 	"jukebox_song.spirit_vector.cassette.im_down.desc": "§fI'm Down!!! - Nulb",
 	"jukebox_song.spirit_vector.cassette.emulator.desc": "§fEMULATOR - Nulb",
-	"gui.spirit_vector.screen.rune_matrix": "Rune Matrix"
+	"gui.spirit_vector.screen.rune_matrix": "Rune Matrix",
+	"death.attack.footstool.item": "%s got styled on by %s",
+	"death.attack.footstool.player": "%s got styled on by %s",
+	"death.attack.footstool": "%s got styled on"
 }

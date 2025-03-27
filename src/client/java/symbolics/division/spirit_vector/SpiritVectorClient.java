@@ -22,6 +22,7 @@ import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
 import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
+import symbolics.division.spirit_vector.networking.FootstoolPayloadC2S;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
 import symbolics.division.spirit_vector.networking.OpenRMConfigRequestPayloadC2S;
 import symbolics.division.spirit_vector.render.SpellDimensionRenderer;
@@ -113,6 +114,8 @@ public class SpiritVectorClient implements ClientModInitializer {
 		SpiritVector.configCallback = () -> {
 			ClientPlayNetworking.send(new OpenRMConfigRequestPayloadC2S());
 		};
+
+		FootstoolPayloadC2S.register(ClientPlayNetworking::send);
 	}
 
 //	private <T extends CustomPayload>

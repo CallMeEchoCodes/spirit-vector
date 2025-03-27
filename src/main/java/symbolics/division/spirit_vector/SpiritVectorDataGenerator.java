@@ -23,6 +23,7 @@ import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.entity.damage.DamageType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -33,9 +34,11 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import symbolics.division.spirit_vector.registry.SpiritVectorDamageTypes;
 import symbolics.division.spirit_vector.sfx.SFXPack;
 
 import java.util.List;
@@ -147,6 +150,21 @@ public class SpiritVectorDataGenerator implements DataGeneratorEntrypoint {
 			getOrCreateTagBuilder(SpiritVectorTags.Misc.JUKEBOX_LOOPING)
 				.add(SpiritVectorSounds.TAKE_BREAK_LOOP)
 				.add(SpiritVectorSounds.SHOW_DONE_LOOP);
+		}
+	}
+
+	private static class SVDamageTagGenerator extends FabricTagProvider<DamageType> {
+		public SVDamageTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+			super(output, RegistryKeys.DAMAGE_TYPE, registriesFuture);
+		}
+
+		@Override
+		protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
+			getOrCreateTagBuilder(DamageTypeTags.DAMAGES_HELMET)
+				.add(SpiritVectorDamageTypes.FOOTSTOOL);
+
+			getOrCreateTagBuilder(DamageTypeTags.BYPASSES_SHIELD)
+				.add(SpiritVectorDamageTypes.FOOTSTOOL);
 		}
 	}
 

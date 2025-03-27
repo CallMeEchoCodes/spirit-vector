@@ -24,5 +24,6 @@ public class SpiritVectorRegistration {
         SpiritVectorAbilitiesRegistry.init();
         VectorType.init();
 		RuneMatrixScreenHandler.init();
-    }
+		SpiritVectorDamageTypes.init();
+	}
 }

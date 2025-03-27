@@ -1,20 +1,25 @@
 package symbolics.division.spirit_vector.logic.move;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import symbolics.division.spirit_vector.SpiritVectorMod;
-import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
+import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
+import symbolics.division.spirit_vector.networking.FootstoolPayloadC2S;
+
+import java.util.List;
 
 public class LedgeVaultMovement extends AbstractMovementType {
     private static final int MOMENTUM_GAINED = SpiritVector.MAX_MOMENTUM / 30;
     private static final int VAULT_WINDOW_TICKS = 5;
     private static final float VAULT_SPEED = 1.2f;
     private static final Identifier VAULT_STATE_ID = SpiritVectorMod.id("vault_window");
+	private static final Identifier FOOTSTOOL_COOLDOWN = SpiritVectorMod.id("footstool_cooldown");
 
     public LedgeVaultMovement(Identifier id) {
         super(id);
@@ -29,11 +34,28 @@ public class LedgeVaultMovement extends AbstractMovementType {
     @Override
     public void configure(SpiritVector sv) {
         sv.stateManager().register(VAULT_STATE_ID, new ManagedState(sv));
+		sv.stateManager().register(FOOTSTOOL_COOLDOWN, new ManagedState(sv));
     }
 
     @Override
     public boolean testMovementCondition(SpiritVector sv, TravelMovementContext ctx) {
-        return sv.stateManager().isActive(VAULT_STATE_ID) && sv.user.isOnGround() && sv.inputManager().consume(Input.JUMP);
+		if (sv.stateManager().isActive(VAULT_STATE_ID) && sv.user.isOnGround() && sv.inputManager().consume(Input.JUMP))
+			return true;
+		if (!sv.user.isOnGround() && sv.inputManager().pressed(Input.JUMP) && !sv.stateManager().isActive(FOOTSTOOL_COOLDOWN)) {
+			List<LivingEntity> collisions = sv.user.getWorld().getNonSpectatingEntities(LivingEntity.class, sv.user.getBoundingBox());
+			if (collisions.size() > 1) {
+				sv.inputManager().consume(Input.JUMP);
+				sv.stateManager().enableStateFor(FOOTSTOOL_COOLDOWN, 20);
+				float damage = (float) sv.user.getVelocity().lengthSquared();
+				for (LivingEntity e : collisions) {
+					if (e == sv.user) continue;
+					FootstoolPayloadC2S.send(e, damage);
+					break;
+				}
+				return true;
+			}
+		}
+		return false;
     }
 
     @Override

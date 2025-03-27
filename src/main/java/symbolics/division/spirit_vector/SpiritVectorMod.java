@@ -19,6 +19,7 @@ import symbolics.division.spirit_vector.compat.ModCompatibility;
 import symbolics.division.spirit_vector.logic.SVEntityState;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
+import symbolics.division.spirit_vector.networking.FootstoolPayloadC2S;
 import symbolics.division.spirit_vector.networking.ModifyMomentumPayloadS2C;
 import symbolics.division.spirit_vector.networking.OpenRMConfigRequestPayloadC2S;
 import symbolics.division.spirit_vector.networking.PhysicalizeMateriaPayloadC2S;
@@ -57,6 +58,8 @@ public final class SpiritVectorMod implements ModInitializer {
 		registerC2S(SlamPacketC2S.ID, SlamPacketC2S.CODEC, SlamPacketC2S::HANDLER);
 
 		registerC2S(OpenRMConfigRequestPayloadC2S.ID, OpenRMConfigRequestPayloadC2S.CODEC, OpenRMConfigRequestPayloadC2S::HANDLER);
+
+		registerC2S(FootstoolPayloadC2S.ID, FootstoolPayloadC2S.CODEC, FootstoolPayloadC2S::HANDLER);
 
 		PayloadTypeRegistry.playC2S().register(SVEntityState.Payload.ID, SVEntityState.Payload.CODEC);
 		PayloadTypeRegistry.playS2C().register(SVEntityState.Payload.ID, SVEntityState.Payload.CODEC);
