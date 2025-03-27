@@ -26,6 +26,7 @@ import symbolics.division.spirit_vector.networking.PhysicalizeMateriaPayloadC2S;
 import symbolics.division.spirit_vector.registry.SpiritVectorRegistration;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXRequestPayload;
+import symbolics.division.spirit_vector.sfx.SpiritVectorSFX;
 
 public final class SpiritVectorMod implements ModInitializer {
 	public static final String MODID = "spirit_vector";
@@ -50,6 +51,7 @@ public final class SpiritVectorMod implements ModInitializer {
 		SpiritVectorSounds.init();
 		SpiritVectorTags.init();
 		SpiritVectorLoot.init();
+		SpiritVectorSFX.init();
 
 		PayloadTypeRegistry.playC2S().register(SFXRequestPayload.ID, SFXRequestPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(SFXRequestPayload.ID, EffectsManager::acceptC2SPayload);

@@ -1,7 +1,9 @@
 package symbolics.division.spirit_vector.logic.move;
 
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
 import symbolics.division.spirit_vector.logic.input.Arrow;
@@ -12,6 +14,7 @@ import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
+import symbolics.division.spirit_vector.sfx.SpiritVectorSFX;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +77,20 @@ public class SpellMovement extends NeutralMovement {
 			sv.stateManager().clearTicks(CASTING_STATE_ID);
 		}
 		SlideMovement.travelWithInput(sv, Vec3d.ZERO);
+
+		World world = sv.user.getWorld();
+
+		int n = sv.user.getRandom().nextBetween(5, 10);
+		Vec3d vel = sv.user.getVelocity().normalize();
+		for (int i = 0; i < n; i++) {
+			Vec3d pv = vel.multiply(sv.user.getRandom().nextDouble());
+			int sign = i % 2 == 0 ? 1 : -1;
+//			Vec3d off = vel.multiply(sign).multiply(0.5 + sv.user.getRandom().nextFloat() * 2).add(sv.user.getPos());
+//			world.addParticle((ParticleEffect) SpiritVectorSFX.Particles.SPELL_CASTING, off.x, off.y, off.z, pv.x * sign, 0, pv.z * sign);
+			Vec3d off = sv.user.getPos(); //.add(vel.multiply(sign * (0.5f + sv.user.getRandom().nextFloat() * 20)));
+			world.addParticle((ParticleEffect) SpiritVectorSFX.Particles.SPELL_CASTING, off.x, off.y, off.z, pv.x * sign, 0, pv.z * sign);
+		}
+
 		ctx.ci().cancel();
 	}
 

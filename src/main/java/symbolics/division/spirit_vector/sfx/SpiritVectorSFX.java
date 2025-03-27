@@ -1,9 +1,20 @@
 package symbolics.division.spirit_vector.sfx;
 
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.api.SpiritVectorSFXApi;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class SpiritVectorSFX {
     // Spirit Vector's default SFX.
@@ -55,4 +66,15 @@ public final class SpiritVectorSFX {
     public static Map<UUID, SimpleSFX> getUniqueSFX() {
         return Collections.unmodifiableMap(UNIQUE_SFX);
     }
+
+	public static final class Particles {
+		public static final ParticleType<SimpleParticleType> SPELL_CASTING = of("spell_casting", FabricParticleTypes.simple());
+
+		private static <T extends ParticleEffect> ParticleType<T> of(String id, ParticleType<T> type) {
+			return Registry.register(Registries.PARTICLE_TYPE, SpiritVectorMod.id(id), type);
+		}
+	}
+
+	public static void init() {
+	}
 }

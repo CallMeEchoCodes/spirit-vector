@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.sfx.particle.FeatherParticle;
 import symbolics.division.spirit_vector.sfx.particle.RuneParticle;
+import symbolics.division.spirit_vector.sfx.particle.SpellcastingParticle;
 import symbolics.division.spirit_vector.sfx.particle.SpiritParticle;
 
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public class ClientSFX {
                     overrides.getOrDefault(sfx.id(), SpiritParticle.SpiritParticleFactory::new)
             );
         }
+
+		ParticleFactoryRegistry.getInstance().register(SpiritVectorSFX.Particles.SPELL_CASTING, SpellcastingParticle.Factory::new);
     }
 
     public static PositionedSoundInstance cassette(SoundEvent sound, Vec3d pos) {
