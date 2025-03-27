@@ -21,7 +21,7 @@ public class ClientSFX {
     private static final Map<Identifier, ParticleFactoryRegistry.PendingParticleFactory<SimpleParticleType>> overrides = new HashMap<>();
 
     static {
-        overrides.put(SpiritVectorSFX.BIRD.id, FeatherParticle.FeatherParticleFactory::new);
+        overrides.put(SpiritVectorSFX.BIRD.id(), FeatherParticle.FeatherParticleFactory::new);
         overrides.put(SpiritVectorMod.id("angel"), RuneParticle.RuneParticleFactory::new);
         overrides.put(SpiritVectorMod.id("familiar"), RuneParticle.EmberParticleFactory::new);
         overrides.put(SpiritVectorMod.id("clover"), FeatherParticle.FeatherParticleFactory::new);
@@ -31,12 +31,12 @@ public class ClientSFX {
     public static void registerAll() {
         for (SimpleSFX sfx : SpiritVectorSFX.getSimpleSFX()) {
             ParticleFactoryRegistry.getInstance().register(sfx.particleType(),
-                    overrides.getOrDefault(sfx.id, SpiritParticle.SpiritParticleFactory::new)
+                    overrides.getOrDefault(sfx.id(), SpiritParticle.SpiritParticleFactory::new)
             );
         }
         for (SimpleSFX sfx : SpiritVectorSFX.getUniqueSFX().values()) {
             ParticleFactoryRegistry.getInstance().register(sfx.particleType(),
-                    overrides.getOrDefault(sfx.id, SpiritParticle.SpiritParticleFactory::new)
+                    overrides.getOrDefault(sfx.id(), SpiritParticle.SpiritParticleFactory::new)
             );
         }
     }
