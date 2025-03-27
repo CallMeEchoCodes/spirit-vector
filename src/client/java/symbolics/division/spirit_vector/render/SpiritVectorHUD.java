@@ -104,8 +104,8 @@ public class SpiritVectorHUD {
 	public static void renderSoaring(DrawContext ctx) {
 		int mid = ctx.getScaledWindowWidth() / 2;
 		int left = mid - 160;
-		int right = mid + 160;
-		int top = ctx.getScaledWindowHeight() - 39;
+		int right = mid + 160 - 32;
+		int top = ctx.getScaledWindowHeight() - 54;
 
 		var client = MinecraftClient.getInstance();
 		var player = client.player;
@@ -120,11 +120,20 @@ public class SpiritVectorHUD {
 
 			if (sv.isSoaring()) {
 				ctx.drawTexture(sv.getSFX().wingsTexture(), left + WING_RENDER_REGION, top, WING_RENDER_REGION, WING_RENDER_REGION, 0, 0, WING_RENDER_REGION, WING_RENDER_REGION, WING_TEXTURE_SIZE, WING_TEXTURE_SIZE);
-				// TODO: Flip the renderer horizontally
-				ctx.drawTexture(sv.getSFX().wingsTexture(), 0, 0, WING_RENDER_REGION, WING_RENDER_REGION, 0, 0, WING_RENDER_REGION, WING_RENDER_REGION, WING_TEXTURE_SIZE, WING_TEXTURE_SIZE);
+				// TODO: make this pretty
+				MatrixStack matrices = ctx.getMatrices();
+				SpiritVectorHUD.drawTexturedQuad(
+					matrices,
+					sv.getSFX().wingsTexture(),
+					right - WING_TEXTURE_SIZE, right,
+					top, top + WING_TEXTURE_SIZE,
+					0,
+					1, 0,
+					0, 1,
+					1, 1, 1, 1
+				);
 			}
 		}
-
 	}
 
 	private static final int[] ticksArrowsVisible = new int[Spell.MAX_CODE_LENGTH];

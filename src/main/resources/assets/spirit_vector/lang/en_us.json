@@ -43,6 +43,7 @@
 	"spirit_vector.abilities.power_slide": "DIVE",
 	"spirit_vector.abilities.cosmetic_wings": "NEPHILIM BLESSING",
 	"spirit_vector.abilities.water_run": "WAVEDANCER",
+	"spirit_vector.abilities.anchor": "ANCHOR",
 	"tooltip.desc.spirit_vector_ability.spirit_vector.dash": "(cost: small) Immediately set your movement in your horizontal input direction. Activate with no input to use as an airbrake.",
 	"tooltip.desc.spirit_vector_ability.spirit_vector.teleport": "(cost: very high) Consume all Poise to teleport a short distance.",
 	"tooltip.desc.spirit_vector_ability.spirit_vector.soar": "(cost: medium) Gain a velocity impulse in your look direction.",
