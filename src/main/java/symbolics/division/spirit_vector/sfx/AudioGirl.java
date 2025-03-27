@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 
@@ -19,5 +20,10 @@ public class AudioGirl {
                 null, pos, SpiritVectorSounds.BURST, SoundCategory.PLAYERS, 0.2f, player.getRandom().nextFloat() * 0.1f + 0.95f
         );
     }
+
+	public static void brake(PlayerEntity player, BlockPos pos) {
+		player.playSound(SoundEvents.ENTITY_BAT_TAKEOFF, 0.2f, player.getRandom().nextFloat() * 0.1f + 2f);
+	}
+
 
 }

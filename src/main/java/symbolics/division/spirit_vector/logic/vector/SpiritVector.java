@@ -36,6 +36,7 @@ import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.state.ParticleTrailEffectState;
 import symbolics.division.spirit_vector.logic.state.StateManager;
 import symbolics.division.spirit_vector.logic.state.WingsEffectState;
+import symbolics.division.spirit_vector.sfx.AudioGirl;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 import symbolics.division.spirit_vector.sfx.SFXPack;
 
@@ -166,6 +167,9 @@ public class SpiritVector {
 			|| (getMoveState() == MovementType.WALL_RUSH && user.getVelocity().withAxis(Direction.Axis.Y, 0).lengthSquared() > 0))
 			&& inputManager().rawInput(Input.SPRINT)) {
 			user.setVelocity(user.getVelocity().multiply(0.5));
+			if (user instanceof PlayerEntity player && user.getVelocity().length() > 0.1) {
+				AudioGirl.brake(player, player.getBlockPos());
+			}
 		}
 
 //        MovementType prev = getMoveState();
