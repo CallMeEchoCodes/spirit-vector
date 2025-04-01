@@ -4,20 +4,24 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
-import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.logic.move.LedgeVaultMovement;
+import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
 import java.util.List;
 
@@ -53,9 +57,8 @@ public class EntityMixin {
     // along its desired movement where a step up can occur
 
     // slabs count as 1.0 for some reason, whatever
-    private static final float VAULT_TRIGGER_STEP_DISTANCE = 0.3f;
-
-    @Shadow private boolean collidedSoftly;
+	@Unique
+	private static final float dbsv$VAULT_TRIGGER_STEP_DISTANCE = 0.3f;
 
     @Shadow // collectColliders
     static List<VoxelShape> findCollisionsForMovement(
@@ -174,7 +177,7 @@ public class EntityMixin {
                 stepUpMovement = stepUpMovement.add(0.0, -d, 0.0);
 
                 double stepAdjust = stepUpMovement.y - movement.y;
-                if (       ( stepAdjust >= VAULT_TRIGGER_STEP_DISTANCE && entity.isOnGround() )
+				if ((stepAdjust >= dbsv$VAULT_TRIGGER_STEP_DISTANCE && entity.isOnGround())
                         || ( stepAdjust > 0 && !entity.isOnGround()) ) {
                     LedgeVaultMovement.triggerLedge(sv);
                 }

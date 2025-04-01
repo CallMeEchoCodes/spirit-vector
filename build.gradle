@@ -23,6 +23,7 @@ dependencies {
 
 	modCompileOnly libs.dancerizer
 	modCompileOnly libs.zipline
+//	modImplementation libs.zipline
 }
 
 loom {

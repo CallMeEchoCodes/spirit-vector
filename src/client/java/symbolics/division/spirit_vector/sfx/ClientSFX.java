@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.sfx.particle.FeatherParticle;
+import symbolics.division.spirit_vector.sfx.particle.GrindsparkParticle;
 import symbolics.division.spirit_vector.sfx.particle.RuneParticle;
 import symbolics.division.spirit_vector.sfx.particle.SpellcastingParticle;
 import symbolics.division.spirit_vector.sfx.particle.SpiritParticle;
@@ -26,7 +27,9 @@ public class ClientSFX {
         overrides.put(SpiritVectorMod.id("angel"), RuneParticle.RuneParticleFactory::new);
         overrides.put(SpiritVectorMod.id("familiar"), RuneParticle.EmberParticleFactory::new);
         overrides.put(SpiritVectorMod.id("clover"), FeatherParticle.FeatherParticleFactory::new);
-//		overrides.put(SpiritVectorMod.id("parrot"), FeatherParticle.FeatherParticleFactory::new);
+		overrides.put(SpiritVectorMod.id("codec"), GrindsparkParticle.GrindsparkParticleFactory::new);
+		overrides.put(SpiritVectorMod.id("flutter"), FeatherParticle.FlitterParticleFactory::new);
+		overrides.put(SpiritVectorMod.id("parrot"), FeatherParticle.FeatherParticleFactory::new);
     }
 
     public static void registerAll() {

@@ -1,6 +1,10 @@
 package symbolics.division.spirit_vector.sfx.particle;
 
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 
@@ -54,6 +58,9 @@ public class RuneParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz) {
+			x += clientWorld.random.nextFloat() - 0.5;
+			y += 1 + clientWorld.random.nextFloat() - 0.5;
+			z += clientWorld.random.nextFloat() - 0.5;
             return new RuneParticle(clientWorld, x, y, z, 0.96F, 1.4F, this.spriteProvider);
         }
     }
@@ -66,6 +73,9 @@ public class RuneParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz) {
+			x += clientWorld.random.nextFloat() - 0.5;
+			y += 1 + clientWorld.random.nextFloat() - 0.5;
+			z += clientWorld.random.nextFloat() - 0.5;
             return new RuneParticle(clientWorld, x, y-1, z, 0.9f, 1.1f - clientWorld.random.nextFloat() * 0.2f, this.spriteProvider);
         }
     }

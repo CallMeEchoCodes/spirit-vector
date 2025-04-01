@@ -17,6 +17,7 @@ import symbolics.division.spirit_vector.logic.move.AbstractMovementType;
 import symbolics.division.spirit_vector.logic.move.MovementType;
 import symbolics.division.spirit_vector.logic.move.MovementUtils;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
+import symbolics.division.spirit_vector.logic.state.ParticleTrailEffectState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
 import java.util.Collection;
@@ -32,6 +33,7 @@ public class ZiplineCompat implements ModCompatibility {
 		private static final Identifier ZIP_CHECKED_STATE = SpiritVectorMod.id("compat.zipline_checked");
 		private static final Identifier SAME_CABLE_COOLDOWN = SpiritVectorMod.id("compat.zipline_same_cable");
 		private static final Identifier ZIP_GRIND_STATE = SpiritVectorMod.id("compat.zip_grind");
+		private static final Identifier ZIP_JUMP_COYOTE = SpiritVectorMod.id("compat.zip_jump_coyote");
 
 		public ZiplineGrindMovement(Identifier id) {
 			super(id);
@@ -42,11 +44,17 @@ public class ZiplineCompat implements ModCompatibility {
 			sv.stateManager().register(ZIP_CHECKED_STATE, new ManagedState(sv));
 			sv.stateManager().register(SAME_CABLE_COOLDOWN, new ManagedState(sv));
 			sv.stateManager().register(ZIP_GRIND_STATE, new ZiplineGrindState(sv));
+			sv.stateManager().register(ZIP_JUMP_COYOTE, new ManagedState(sv));
 		}
 
 		@Override
 		public boolean testMovementCondition(SpiritVector sv, TravelMovementContext ctx) {
 			ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
+
+			// evil: coyote time application in condition testing
+			if (sv.stateManager().isActive(ZIP_JUMP_COYOTE) && sv.inputManager().consume(Input.JUMP)) {
+				zipJump(sv, grindState, ctx);
+			}
 
 			if (sv.inputManager().released(Input.CROUCH)) {
 				sv.stateManager().clearTicks(SAME_CABLE_COOLDOWN);
@@ -87,17 +95,13 @@ public class ZiplineCompat implements ModCompatibility {
 		public boolean testMovementCompleted(SpiritVector sv, TravelMovementContext ctx) {
 			ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
 			if (sv.inputManager().consume(Input.JUMP)) {
-				double jump = MathHelper.clamp(grindState.speed, 0.6, 1);
-				sv.user.setVelocity(
-					MovementUtils.augmentedInput(sv, ctx).multiply(grindState.speed).add(0, jump, 0)
-				);
-				sv.effectsManager().spawnRing(sv.user.getPos(), Vec3d.ZERO);
-				sv.stateManager().enableStateFor(ZIP_CHECKED_STATE, 5);
+				zipJump(sv, grindState, ctx);
 				return true;
 			}
 
 			if (!sv.inputManager().rawInput(Input.CROUCH)) {
 				sv.stateManager().enableStateFor(ZIP_CHECKED_STATE, 5);
+				sv.stateManager().enableStateFor(ZIP_JUMP_COYOTE, 5);
 				return true;
 			}
 
@@ -121,6 +125,8 @@ public class ZiplineCompat implements ModCompatibility {
 		@Override
 		public void travel(SpiritVector sv, TravelMovementContext ctx) {
 			ctx.ci().cancel();
+
+			sv.stateManager().getState(ParticleTrailEffectState.ID).enableFor(2);
 
 			ZiplineGrindState grindState = (ZiplineGrindState) sv.stateManager().getState(ZIP_GRIND_STATE);
 			double MAX_TURN_ANGLE = 0.707;
@@ -195,6 +201,15 @@ public class ZiplineCompat implements ModCompatibility {
 				if (!other.isEmpty()) return false;
 			}
 			return true;
+		}
+
+		private static void zipJump(SpiritVector sv, ZiplineGrindState grindState, TravelMovementContext ctx) {
+			double jump = MathHelper.clamp(grindState.speed, 0.6, 1);
+			sv.user.setVelocity(
+				MovementUtils.augmentedInput(sv, ctx).multiply(grindState.speed).add(0, jump, 0)
+			);
+			sv.effectsManager().spawnRing(sv.user.getPos(), Vec3d.ZERO);
+			sv.stateManager().enableStateFor(ZIP_CHECKED_STATE, 5);
 		}
 	}
 

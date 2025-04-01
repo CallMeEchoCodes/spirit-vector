@@ -14,6 +14,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,7 +24,8 @@ import symbolics.division.spirit_vector.sfx.ClientSFX;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
-	private boolean shouldCancel() {
+	@Unique
+	private boolean dbsv$shouldCancel() {
 		return MinecraftClient.getInstance().world.spellDimension().isCasting();
 	}
 
@@ -57,7 +59,7 @@ public class WorldRendererMixin {
 			target = "Lnet/minecraft/client/render/BackgroundRenderer;applyFogColor()V")
 	)
 	public void cancelBackground(Operation<Void> original) {
-		if (!shouldCancel()) original.call();
+		if (!dbsv$shouldCancel()) original.call();
 	}
 
 	@Inject(
@@ -66,7 +68,7 @@ public class WorldRendererMixin {
 		cancellable = true
 	)
 	public void cancelSky(Matrix4f matrix4f, Matrix4f projectionMatrix, float tickDelta, Camera camera, boolean thickFog, Runnable fogCallback, CallbackInfo ci) {
-		if (shouldCancel()) ci.cancel();
+		if (dbsv$shouldCancel()) ci.cancel();
 	}
 }
 

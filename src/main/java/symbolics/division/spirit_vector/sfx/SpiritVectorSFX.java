@@ -40,6 +40,9 @@ public final class SpiritVectorSFX {
         registerUnique("sky", UUID.fromString("c45e97e6-94ef-42da-8b5e-0c3209551c3f"));
         registerUnique("phonomancer", UUID.fromString("f757c36c-51c9-4a77-8d46-90dd6fc77057"));
 		registerUnique("parrot", UUID.fromString("d1c66a9d-8bf9-473a-965f-315cc1272a4e"));
+		registerUnique("tomato", UUID.fromString("e0db8fa8-1cc4-4542-bf53-3a8f986f3d6f"));
+		registerUnique("codec", UUID.fromString("c12448d6-159c-47f8-8635-b3ad4026a751"));
+		registerUnique("flutter", UUID.fromString("09391869-132f-4fc2-9c92-e58af55cbabb"));
     }
 
     private static SimpleSFX registerSimple(String name, int color) {

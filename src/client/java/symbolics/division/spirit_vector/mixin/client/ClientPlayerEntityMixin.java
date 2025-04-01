@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -22,19 +23,23 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implemen
         super(world, profile);
     }
 
-    public SpiritVector spiritVector;
-    public ItemStack prevStack = ItemStack.EMPTY;
-    @Override
+	@Unique
+	public SpiritVector dbsv$spiritVector;
+
+	@Unique
+	public ItemStack dbsv$prevStack = ItemStack.EMPTY;
+
+	@Override
     public SpiritVector spiritVector() {
         ItemStack item = SpiritVector.getEquippedItem(this);
         if (item == null) {
-            spiritVector = null;
-        } else if (spiritVector == null || !ItemStack.areItemsAndComponentsEqual(item, prevStack)) {
-            spiritVector = SpiritVector.of((LivingEntity)(Entity)this, item);
-            prevStack = item;
+			dbsv$spiritVector = null;
+		} else if (dbsv$spiritVector == null || !ItemStack.areItemsAndComponentsEqual(item, dbsv$prevStack)) {
+			dbsv$spiritVector = SpiritVector.of((LivingEntity) (Entity) this, item);
+			dbsv$prevStack = item;
             setWingState(false);
         }
-        return spiritVector;
+		return dbsv$spiritVector;
     }
 
     @Override

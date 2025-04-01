@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,36 +21,40 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity {
         super(world, pos, yaw, gameProfile);
     }
 
-    private EngineSoundInstance engineSound;
-    private SlidingSoundInstance slidingSound;
-	private SpellDimensionSoundInstance spellSound;
-    @Inject(method = "tick", at = @At("HEAD"))
+	@Unique
+	private EngineSoundInstance dbsv$engineSound;
+	@Unique
+	private SlidingSoundInstance dbsv$slidingSound;
+	@Unique
+	private SpellDimensionSoundInstance dbsv$spellSound;
+
+	@Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
-        if (slidingSound == null) {
+		if (dbsv$slidingSound == null) {
             if (SlidingSoundInstance.shouldPlayFor((AbstractClientPlayerEntity) (PlayerEntity) this)) {
-                slidingSound = new SlidingSoundInstance(this);
-                MinecraftClient.getInstance().getSoundManager().play(slidingSound);
+				dbsv$slidingSound = new SlidingSoundInstance(this);
+				MinecraftClient.getInstance().getSoundManager().play(dbsv$slidingSound);
             }
-        } else if (slidingSound.isDone()) {
-            slidingSound = null;
+		} else if (dbsv$slidingSound.isDone()) {
+			dbsv$slidingSound = null;
         }
 
-        if (engineSound == null) {
+		if (dbsv$engineSound == null) {
             if (EngineSoundInstance.shouldPlayFor((AbstractClientPlayerEntity) (PlayerEntity) this)) {
-                engineSound = new EngineSoundInstance(this);
-                MinecraftClient.getInstance().getSoundManager().play(engineSound);
+				dbsv$engineSound = new EngineSoundInstance(this);
+				MinecraftClient.getInstance().getSoundManager().play(dbsv$engineSound);
             }
-        } else if (engineSound.isDone()) {
-            engineSound = null;
+		} else if (dbsv$engineSound.isDone()) {
+			dbsv$engineSound = null;
         }
 
-		if (spellSound == null) {
+		if (dbsv$spellSound == null) {
 			if (SpellDimensionSoundInstance.shouldPlayFor((AbstractClientPlayerEntity) (PlayerEntity) this)) {
-				spellSound = new SpellDimensionSoundInstance(this);
-				MinecraftClient.getInstance().getSoundManager().play(spellSound);
+				dbsv$spellSound = new SpellDimensionSoundInstance(this);
+				MinecraftClient.getInstance().getSoundManager().play(dbsv$spellSound);
 			}
-		} else if (spellSound.isDone() || spellSound.getVolume() == 0.0) {
-			spellSound = null;
+		} else if (dbsv$spellSound.isDone() || dbsv$spellSound.getVolume() == 0.0) {
+			dbsv$spellSound = null;
 		}
     }
 }

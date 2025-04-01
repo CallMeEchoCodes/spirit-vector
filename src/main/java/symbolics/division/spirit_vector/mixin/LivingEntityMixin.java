@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,18 +29,20 @@ public abstract class LivingEntityMixin extends Entity {
 
 	// cache instanceof check
 	// maybe generalize into caching object
-	public boolean checked = false;
-	public boolean isSVUser = false;
+	@Unique
+	private boolean dbsv$checked = false;
+	@Unique
+	private boolean dbsv$isSVUser = false;
 
 	@Nullable
 	public SpiritVector maybeGetSpiritVector() {
-		if (!checked) {
-			checked = true;
+		if (!dbsv$checked) {
+			dbsv$checked = true;
 			if (this instanceof ISpiritVectorUser user) {
-				isSVUser = true;
+				dbsv$isSVUser = true;
 			}
 		}
-		if (isSVUser) {
+		if (dbsv$isSVUser) {
 			return ((ISpiritVectorUser) this).spiritVector();
 		}
 		return null;

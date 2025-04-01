@@ -1,6 +1,10 @@
 package symbolics.division.spirit_vector.sfx.particle;
 
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.SimpleParticleType;
@@ -73,7 +77,10 @@ public class SpiritParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz) {
-            return new SpiritParticle(clientWorld, x, y, z, vx, vy, vz, this.spriteProvider);
+			x += clientWorld.random.nextFloat() - 0.5;
+			y += 1 + clientWorld.random.nextFloat() - 0.5;
+			z += clientWorld.random.nextFloat() - 0.5;
+			return new SpiritParticle(clientWorld, x, y, z, 0, 0, 0, this.spriteProvider);
         }
     }
 

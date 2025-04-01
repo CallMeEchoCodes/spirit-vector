@@ -52,6 +52,7 @@ public class LedgeVaultMovement extends AbstractMovementType {
 					FootstoolPayloadC2S.send(e, damage);
 					break;
 				}
+				sv.modifyMomentum((int) damage);
 				return true;
 			}
 		}

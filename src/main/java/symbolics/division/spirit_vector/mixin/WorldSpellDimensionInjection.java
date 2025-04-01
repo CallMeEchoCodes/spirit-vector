@@ -18,15 +18,15 @@ import java.util.function.Supplier;
 @Mixin(World.class)
 public class WorldSpellDimensionInjection implements SpellDimensionHaver {
 	@Unique
-	private SpellDimension spellDimension;
+	private SpellDimension dbsv$spellDimension;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void injectSpellDimension(MutableWorldProperties properties, RegistryKey registryRef, DynamicRegistryManager registryManager, RegistryEntry dimensionEntry, Supplier profiler, boolean isClient, boolean debugWorld, long biomeAccess, int maxChainedNeighborUpdates, CallbackInfo ci) {
-		spellDimension = new SpellDimension((World) (Object) this);
+		dbsv$spellDimension = new SpellDimension((World) (Object) this);
 	}
 
 	@Override
 	public SpellDimension spellDimension() {
-		return spellDimension;
+		return dbsv$spellDimension;
 	}
 }

@@ -23,7 +23,7 @@ public class EffectsManager {
     public static void acceptC2SPayload(SFXRequestPayload payload, ServerPlayNetworking.Context ctx) {
         var player = ctx.player();
         if (payload.type().equals(SFXRequestPayload.PARTICLE_EFFECT_TYPE)) {
-            spawnParticleImpl((ServerWorld)player.getWorld(), payload.pack(), new Vec3d(payload.pos()));
+			spawnParticleImpl((ServerWorld) player.getWorld(), payload.pack(), new Vec3d(payload.pos()), new Vec3d(payload.dir()));
         } else if (payload.type().equals(SFXRequestPayload.RING_EFFECT_TYPE)) {
             spawnRingImpl((ServerWorld)player.getWorld(), payload.pack(), new Vec3d(payload.pos()), new Vec3d(payload.dir()));
         } else if (payload.type().equals(SFXRequestPayload.BURST_SOUND_TYPE)) {
@@ -44,11 +44,11 @@ public class EffectsManager {
         this.sv = sv;
     }
 
-    public void spawnParticle(World world, Vec3d pos) {
+	public void spawnParticle(World world, Vec3d pos, Vec3d dir) {
         if (world.isClient) {
-            requestCallback.accept(new SFXRequestPayload(SFXRequestPayload.PARTICLE_EFFECT_TYPE, sv.getSFX(), pos.toVector3f(), new Vector3f()));
+			requestCallback.accept(new SFXRequestPayload(SFXRequestPayload.PARTICLE_EFFECT_TYPE, sv.getSFX(), pos.toVector3f(), dir.toVector3f()));
         } else {
-            spawnParticleImpl((ServerWorld) world, sv.getSFX(), pos);
+			spawnParticleImpl((ServerWorld) world, sv.getSFX(), pos, dir);
         }
     }
 
@@ -72,9 +72,9 @@ public class EffectsManager {
 	}
 
     // TODO a nonstaticified version of this
-    private static void spawnParticleImpl(ServerWorld world, SFXPack<?> sfx, Vec3d pos) {
+	private static void spawnParticleImpl(ServerWorld world, SFXPack<?> sfx, Vec3d pos, Vec3d dir) {
         world.spawnParticles(
-                sfx.particleEffect(), pos.x, pos.y, pos.z, 1, 0, 0, 0, 0
+			sfx.particleEffect(), pos.x, pos.y, pos.z, 0, dir.x, dir.y, dir.z, 1
         );
     }
 
