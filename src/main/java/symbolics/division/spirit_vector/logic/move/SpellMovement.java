@@ -6,12 +6,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
+import symbolics.division.spirit_vector.logic.ability.WildMagicAbility;
 import symbolics.division.spirit_vector.logic.input.Arrow;
 import symbolics.division.spirit_vector.logic.input.ArrowManager;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
+import symbolics.division.spirit_vector.logic.spell.StochasticSpell;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 import symbolics.division.spirit_vector.sfx.SpiritVectorSFX;
@@ -73,7 +75,12 @@ public class SpellMovement extends NeutralMovement {
 	@Override
 	public void travel(SpiritVector sv, TravelMovementContext ctx) {
 		if (sv.inputManager().consume(Input.JUMP)) {
-			sv.user.getWorld().spellDimension().cast(new Spell(sv, ((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).eigenCode()));
+			List<Arrow> eigenCode = ((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).eigenCode();
+			if (eigenCode.isEmpty() && WildMagicAbility.xyzzy(sv)) {
+				sv.user.getWorld().spellDimension().cast(new StochasticSpell(sv));
+			} else {
+				sv.user.getWorld().spellDimension().cast(new Spell(sv, ((SpellcastingState) sv.stateManager().getState(CASTING_STATE_ID)).eigenCode()));
+			}
 			sv.stateManager().clearTicks(CASTING_STATE_ID);
 		}
 		SlideMovement.travelWithInput(sv, Vec3d.ZERO);

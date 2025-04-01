@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayPriorityQueue;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import symbolics.division.spirit_vector.SpiritVectorMod;
@@ -32,8 +33,8 @@ public class Spell {
 	private int maxSpellRadius = 0;
 	private int spellRadius = 0;
 	private final float decay;
-	private final float complexity;
-	private int ticksLeft = 0;
+	protected float complexity;
+	protected int ticksLeft = 0;
 	private final SpiritVector sv;
 	private final PriorityQueue<BlockPos> anchors;
 	private final BlockPos center;
@@ -112,12 +113,17 @@ public class Spell {
 			// creates a sphere
 			if (sv.is(VectorType.DREAM) && !bp.isWithinDistance(this.center, maxSpellRadius)) break;
 			Direction d = Direction.byId((bp.getX() + bp.getY() * 2 + bp.getZ() * 3) % 4 + 2);
-			this.core.emplace(sv.user.getWorld(), bp, d, decay);
+			Eidos eidos = emplace(sv.user.getWorld(), bp, d, decay);
 
 			// merge these
 			this.placementCallback.accept(bp);
-			spellDimension.eidosPlaced(sv.user.getWorld(), bp, MathHelper.ceil(this.core.size()) + 2, this.ticksLeft);
+			spellDimension.eidosPlaced(sv.user.getWorld(), bp, MathHelper.ceil(eidos.size()) + 2, this.ticksLeft);
 		}
+	}
+
+	protected Eidos emplace(World world, BlockPos bp, Direction d, float decay) {
+		this.core.emplace(sv.user.getWorld(), bp, d, decay);
+		return this.core;
 	}
 
 	public void setPlacementCallback(Consumer<BlockPos> bc) {
@@ -132,7 +138,7 @@ public class Spell {
 		return cancelled;
 	}
 
-	private Eidos makeCore(List<Arrow> eigenCode) {
+	protected Eidos makeCore(List<Arrow> eigenCode) {
 		Map<Arrow, EidosEdge> edges = new TreeMap<>();
 		edges.put(Arrow.RIGHT, new EidosEdge(3, 0, 1, 0));
 		edges.put(Arrow.UP, new EidosEdge(0, 0, 0, -1));

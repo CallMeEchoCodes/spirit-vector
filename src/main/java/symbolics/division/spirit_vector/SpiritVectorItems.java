@@ -27,6 +27,7 @@ import symbolics.division.spirit_vector.logic.ability.SpiritVectorAbility;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbility;
 import symbolics.division.spirit_vector.logic.ability.TransgenderAbility;
 import symbolics.division.spirit_vector.logic.ability.WaterRunAbility;
+import symbolics.division.spirit_vector.logic.ability.WildMagicAbility;
 import symbolics.division.spirit_vector.sfx.SimpleSFX;
 import symbolics.division.spirit_vector.sfx.SpiritVectorSFX;
 
@@ -55,6 +56,7 @@ public final class SpiritVectorItems {
     public static final DreamRuneItem WATER_RUN_RUNE = registerRuneAndModel("water_run", WaterRunAbility::new);
     public static final DreamRuneItem COSMETIC_WINGS_RUNE = registerRuneAndModel("cosmetic_wings", CosmeticWingsAbility::new);
 	public static final DreamRuneItem LEDGE_LOCK_RUNE = registerRuneAndModel("ledge_lock", LedgeLockAbility::new);
+	public static final DreamRuneItem WILD_MAGIC_RUNE = registerRuneAndModel("wild_magic", WildMagicAbility::new);
 
      public static final SlotTemplateItem LEFT_SLOT_TEMPLATE = registerAndModel("burst_rune_left", new SlotTemplateItem(AbilitySlot.LEFT));
      public static final SlotTemplateItem UP_SLOT_TEMPLATE = registerAndModel("burst_rune_up", new SlotTemplateItem(AbilitySlot.UP));

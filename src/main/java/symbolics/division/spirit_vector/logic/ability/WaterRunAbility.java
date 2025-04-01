@@ -31,7 +31,8 @@ public class WaterRunAbility extends AbstractSpiritVectorAbility {
 
 	@Override
 	public void configure(SpiritVector sv) {
-		sv.stateManager().register(WATER_RUN_FLAG, new ManagedState(sv));
+		if (sv.stateManager().getOptional(WATER_RUN_FLAG).isEmpty())
+			sv.stateManager().register(WATER_RUN_FLAG, new ManagedState(sv));
 	}
 
 	@Override
