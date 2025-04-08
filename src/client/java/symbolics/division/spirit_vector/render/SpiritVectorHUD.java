@@ -25,6 +25,7 @@ import symbolics.division.spirit_vector.logic.move.MovementType;
 import symbolics.division.spirit_vector.logic.move.SpellMovement;
 import symbolics.division.spirit_vector.logic.spell.Spell;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
+import symbolics.division.spirit_vector.sfx.SpiritVectorSFX;
 
 import java.util.List;
 
@@ -66,6 +67,9 @@ public class SpiritVectorHUD {
         int POISE_TEXTURE_SIZE = 16;
         int POISE_RENDER_SIZE = 8;
 		Identifier poiseTexture = SpiritVectorMod.id("textures/item/anima_core_" + sv.getSFX().id().getPath() + ".png");
+		if (sv.getSFX().equals(SpiritVectorSFX.getUniqueSFX().get(sv.user.getUuid()))) {
+			poiseTexture = SpiritVectorMod.id("textures/item/anima_core_" + SpiritVectorSFX.getDefault().id().getPath() + ".png");
+		}
         for (int i = 0; i < n; i++) {
             ctx.drawTexture(poiseTexture, right-(POISE_RENDER_SIZE * (i + 1)), top, POISE_RENDER_SIZE, POISE_RENDER_SIZE, 0, 0, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE, POISE_TEXTURE_SIZE);
         }

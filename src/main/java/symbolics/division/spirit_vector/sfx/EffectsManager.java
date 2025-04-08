@@ -46,6 +46,7 @@ public class EffectsManager {
 
 	public void spawnParticle(World world, Vec3d pos, Vec3d dir) {
         if (world.isClient) {
+			world.addParticle(sv.getSFX().particleEffect(), pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 			requestCallback.accept(new SFXRequestPayload(SFXRequestPayload.PARTICLE_EFFECT_TYPE, sv.getSFX(), pos.toVector3f(), dir.toVector3f()));
         } else {
 			spawnParticleImpl((ServerWorld) world, sv.getSFX(), pos, dir);
