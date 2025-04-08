@@ -32,7 +32,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implemen
 	@Override
     public SpiritVector spiritVector() {
         ItemStack item = SpiritVector.getEquippedItem(this);
-        if (item == null) {
+		if (item == null || this.getAbilities().flying) {
 			dbsv$spiritVector = null;
 		} else if (dbsv$spiritVector == null || !ItemStack.areItemsAndComponentsEqual(item, dbsv$prevStack)) {
 			dbsv$spiritVector = SpiritVector.of((LivingEntity) (Entity) this, item);
