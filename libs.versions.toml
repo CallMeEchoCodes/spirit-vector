@@ -9,7 +9,7 @@ yarn = "1.21+build.9"
 fapi = "0.115.3+1.21.1"
 
 dancerizer = "1.1.0"
-zipline = "1.2.0+1.21.1"
+zipline = "1.2.1+1.21.1"
 
 [plugins]
 loom = { id = "fabric-loom", version.ref = "loom" }
