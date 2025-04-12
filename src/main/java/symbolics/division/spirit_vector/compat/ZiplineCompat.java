@@ -74,13 +74,15 @@ public class ZiplineCompat implements ModCompatibility {
 					}
 
 					Vec3d point = cable.getClosestPoint(sv.user.getPos());
-					if (validPosition(sv.user, point)) {
+					double progress = cable.getProgress(point);
+					if (validPosition(sv.user, point) && progress > 0.02 && progress < 0.98) {
 						grindState.setup(
 							cable,
 							MovementUtils.augmentedInput(sv, ctx),
 							point,
 							sv.user.getVelocity().withAxis(Direction.Axis.Y, 0).length()
 						);
+						sv.user.setPosition(point);
 						grindState.enable();
 						sv.inputManager().consume(Input.CROUCH);
 						sv.user.playSound(ZiplineSoundEvents.ZIPLINE_ATTACH, 0.4f, 2);

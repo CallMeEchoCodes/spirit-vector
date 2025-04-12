@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 
@@ -34,4 +35,8 @@ public record VectorType(Identifier id, SpiritVectorFactory factory) {
     }
 
     public static void init(){}
+
+	public Text getDisplayName() {
+		return Text.translatable("spirit_vector.vector_type." + id.getPath());
+	}
 }

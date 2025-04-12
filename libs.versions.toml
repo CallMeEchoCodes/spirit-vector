@@ -7,6 +7,7 @@ mc = "1.21.1"
 fl = "0.16.10"
 yarn = "1.21+build.9"
 fapi = "0.115.3+1.21.1"
+cloth = "15.0.140"
 
 dancerizer = "1.1.0"
 zipline = "1.2.1+1.21.1"
@@ -21,6 +22,8 @@ mc = { group = "mojang", name = "minecraft", version.ref = "mc" }
 fl = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fl" }
 yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
 fapi = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fapi" }
+cloth = { group = "me.shedaniel.cloth", name = "cloth-config-fabric", version.ref = "cloth" }
 
 dancerizer = { group = "maven.modrinth", name = "dancerizer", version.ref = "dancerizer" }
 zipline = { group = "maven.modrinth", name = "zipline", version.ref = "zipline" }
+

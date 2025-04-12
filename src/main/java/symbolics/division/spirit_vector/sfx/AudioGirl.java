@@ -8,11 +8,17 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 
+import java.util.function.Predicate;
+
 public class AudioGirl {
 
-    public static void step(PlayerEntity player, BlockState state) {
+	public static Predicate<PlayerEntity> playSound = p -> true;
+
+	public static boolean step(PlayerEntity player, BlockState state) {
+		if (!playSound.test(player)) return false;
         BlockSoundGroup blockSoundGroup = state.getSoundGroup();
         player.playSound(SpiritVectorSounds.STEP, blockSoundGroup.getVolume() * 0.1f, blockSoundGroup.getPitch() + (player.getRandom().nextFloat() * 0.066f - 0.033f));
+		return true;
     }
 
     public static void burst(PlayerEntity player, BlockPos pos) {

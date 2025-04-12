@@ -7,23 +7,30 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
+import symbolics.division.spirit_vector.ConfigProfile;
 import symbolics.division.spirit_vector.SpiritVectorMod;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.vector.VectorType;
 import symbolics.division.spirit_vector.render.SpiritVectorHUD;
 
-public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
-	private static final Identifier TEXTURE = SpiritVectorMod.id("textures/gui/container/rune_matrix.png");
-	private static final Identifier INVENTORY_TEXTURE = SpiritVectorMod.id("textures/gui/container/basic_inventory.png");
+import java.util.Objects;
 
-	private static final int MODE_SLOT_LEFT_OFFSET = 56 + 25;
-	private static final int MODE_SLOT_TOP_OFFSET = 7 + 50;
-	private Identifier modeSprite = SpiritVectorMod.id("rune_matrix/vector_mode_spirit");
-	private int prevMode = 0;
+public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
+	public static final Identifier TEXTURE = SpiritVectorMod.id("textures/gui/container/rune_matrix.png");
+	public static final Identifier INVENTORY_TEXTURE = SpiritVectorMod.id("textures/gui/container/basic_inventory.png");
+
+	protected static final int MODE_SLOT_LEFT_OFFSET = 56 + 25;
+	protected static final int MODE_SLOT_TOP_OFFSET = 7 + 50;
+	protected Identifier modeSprite = SpiritVectorMod.id("rune_matrix/vector_mode_spirit");
+	protected int prevMode = 0;
+	protected int ticksSinceModeChanged = 0;
 
 	private static final int SLOT_FULL_SIZE = 28;
 	private static final Identifier SLOT_FULL_TEXTURE = SpiritVectorMod.id("rune_matrix/slot_full");
 	private static final Identifier CORE_EMPTY_TEXTURE = SpiritVectorMod.id("rune_matrix/socket_empty");
+	private static final Identifier VOLUME_OFF = SpiritVectorMod.id("rune_matrix/volume_off");
+	private static final Identifier VOLUME_ON = SpiritVectorMod.id("rune_matrix/volume_on");
 
 	public RuneMatrixScreen(RuneMatrixScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
@@ -32,8 +39,24 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 	}
 
 	@Override
+	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+		super.render(context, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(context, mouseX, mouseY);
+	}
+
+	@Override
 	protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
 		context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY + 44, 4210752, false);
+		ticksSinceModeChanged--;
+		if (ticksSinceModeChanged > 0 && ticksSinceModeChanged < 59) {
+			int alpha = (int) (0xff * ((float) Math.min(ticksSinceModeChanged, 40) / 40));
+			if (alpha <= 0.01) return;
+			int color = ColorHelper.Argb.getArgb(alpha, 0xff, 0xff, 0xff);
+			context.drawText(this.textRenderer, Objects.requireNonNull(VectorType.REGISTRY.get(this.handler.getVectorMode())).getDisplayName(), this.playerInventoryTitleX, this.playerInventoryTitleY + 28, color, false);
+		}
+
+		Identifier playSoundSprite = ConfigProfile.playSound() ? VOLUME_ON : VOLUME_OFF;
+		context.drawGuiTexture(playSoundSprite, this.playerInventoryTitleX + 145, this.playerInventoryTitleY + 39, 16, 16);
 	}
 
 	@Override
@@ -66,9 +89,17 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 		int x2 = x1 + 16;
 		int y1 = MODE_SLOT_TOP_OFFSET + this.y;
 		int y2 = y1 + 16;
+//		System.out.println("mx" + (mouseX - this.x));
+//		System.out.println("my" + (mouseY - this.y));
 		if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) {
 			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_BUZZ, 1);
 			this.client.interactionManager.clickButton(this.handler.syncId, 1);
+			this.ticksSinceModeChanged = 60;
+		} else if (
+			mouseX >= this.x + 156 && mouseX <= this.x + 166 && mouseY >= this.y + 114 && mouseY <= this.y + 124
+		) {
+			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_CLICK, 1);
+			ConfigProfile.setPlaySound(!ConfigProfile.playSound());
 		} else if (this.focusedSlot != null && (!this.handler.getCursorStack().isEmpty() || this.focusedSlot.hasStack())) {
 			SpiritVectorHUD.playUISound(SpiritVectorSounds.RUNE_MATRIX_CLICK, 1);
 		}
@@ -98,40 +129,6 @@ public class RuneMatrixScreen extends HandledScreen<RuneMatrixScreenHandler> {
 	protected void drawSlot(DrawContext context, Slot slot) {
 		if (slot == handler.coreSlot) {
 			return;
-//			int i = slot.x;
-//			int j = slot.y;
-//			ItemStack itemStack = slot.getStack();
-//			boolean bl = false;
-//			ItemStack itemStack2 = this.handler.getCursorStack();
-//			String string = null;
-//			int k;
-//
-//			context.getMatrices().push();
-//			context.getMatrices().translate(0.0F, 0.0F, 100.0F);
-//			if (itemStack.isEmpty() && slot.isEnabled()) {
-//				Pair<Identifier, Identifier> pair = slot.getBackgroundSprite();
-//				if (pair != null) {
-//					Sprite sprite = (Sprite)this.client.getSpriteAtlas((Identifier)pair.getFirst()).apply((Identifier)pair.getSecond());
-//					context.drawSprite(i, j, 0, 16, 16, sprite);
-//				}
-//			}
-//
-//			if (!bl2) {
-//			if (bl) {
-//				context.fill(i, j, i + 16, j + 16, -2130706433);
-//			}
-//
-//			k = slot.x + slot.y * this.backgroundWidth;
-//			if (slot.disablesDynamicDisplay()) {
-//				context.drawItemWithoutEntity(itemStack, i, j, k);
-//			} else {
-//				context.drawItem(itemStack, i, j, k);
-//			}
-//
-//			context.drawItemInSlot(this.textRenderer, itemStack, i, j, string);
-//			}
-//
-//			context.getMatrices().pop();
 		}
 		super.drawSlot(context, slot);
 	}

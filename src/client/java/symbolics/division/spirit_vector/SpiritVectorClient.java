@@ -1,5 +1,7 @@
 package symbolics.division.spirit_vector;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -10,6 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.RenderLayer;
@@ -19,6 +22,7 @@ import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.SVEntityState;
 import symbolics.division.spirit_vector.logic.ability.SlamPacketC2S;
 import symbolics.division.spirit_vector.logic.ability.TeleportAbilityC2SPayload;
+import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
@@ -33,6 +37,7 @@ import symbolics.division.spirit_vector.render.SpiritWingsFeatureRenderer;
 import symbolics.division.spirit_vector.render.SpiritWingsModel;
 import symbolics.division.spirit_vector.screen.RuneMatrixScreen;
 import symbolics.division.spirit_vector.screen.RuneMatrixScreenHandler;
+import symbolics.division.spirit_vector.sfx.AudioGirl;
 import symbolics.division.spirit_vector.sfx.ClientSFX;
 import symbolics.division.spirit_vector.sfx.EffectsManager;
 
@@ -41,6 +46,8 @@ public class SpiritVectorClient implements ClientModInitializer {
 	public void onInitializeClient() {
 
 		/// pardon the dust.
+
+		AutoConfig.register(ConfigProfile.class, JanksonConfigSerializer::new);
 
 		EffectsManager.registerSFXRequestC2SCallback(ClientPlayNetworking::send);
 //		registerS2C(
@@ -116,6 +123,10 @@ public class SpiritVectorClient implements ClientModInitializer {
 		};
 
 		FootstoolPayloadC2S.register(ClientPlayNetworking::send);
+
+		AudioGirl.playSound = p -> p != MinecraftClient.getInstance().player || ConfigProfile.playSound();
+
+		InputManager.chatInputFilter = () -> MinecraftClient.getInstance().currentScreen instanceof ChatScreen;
 	}
 
 //	private <T extends CustomPayload>

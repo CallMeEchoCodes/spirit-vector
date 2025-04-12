@@ -1,6 +1,7 @@
 package symbolics.division.spirit_vector;
 
-import net.minecraft.registry.*;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
@@ -29,6 +30,7 @@ public class SpiritVectorSounds {
     public static final SoundEvent PERCEPTION_REBOUND_LOOP = register("music.perception_rebound.loop");
     public static final SoundEvent FRATRICIDE_SONG = register("music.fratricide");
     public static final SoundEvent FRATRICIDE_LOOP = register("music.fratricide.loop");
+	public static final SoundEvent PHONOMANCY_SONG = register("music.phonomancy");
 
     private static SoundEvent register(String id) {
         return registerWithId(SpiritVectorMod.id(id));

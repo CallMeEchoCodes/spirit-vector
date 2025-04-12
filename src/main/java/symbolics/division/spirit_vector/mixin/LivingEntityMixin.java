@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
-import symbolics.division.spirit_vector.logic.SVEntityState;
 import symbolics.division.spirit_vector.logic.ability.WaterRunAbility;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
@@ -113,11 +112,12 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "takeKnockback", at = @At("HEAD"), cancellable = true)
 	public void takeKnockback(double strength, double x, double z, CallbackInfo ci, @Local(ordinal = 0) LocalDoubleRef strRef) {
 		if (maybeGetSpiritVector() != null) {
+			strRef.set(0);
 			// also needs networking for momentum-based resistance
-			var state = this.getAttached(SVEntityState.ATTACHMENT);
-			if (state != null && state.wingsVisible()) {
-				strRef.set(strength / 10);
-			}
+//			var state = this.getAttached(SVEntityState.ATTACHMENT);
+//			if (state != null && state.wingsVisible()) {
+//				strRef.set(strength / 10);
+//			}
 		}
 	}
 

@@ -73,6 +73,7 @@ public final class SpiritVectorItems {
 		registerCassette("sonic_bee");
 		registerCassette("im_down");
 		registerCassette("emulator");
+		registerCassette("phonomancy");
 	}
 
     static {

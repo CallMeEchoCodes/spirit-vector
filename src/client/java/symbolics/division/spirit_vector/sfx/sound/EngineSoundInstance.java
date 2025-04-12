@@ -1,8 +1,10 @@
 package symbolics.division.spirit_vector.sfx.sound;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.MovingSoundInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import symbolics.division.spirit_vector.ConfigProfile;
 import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.ISpiritVectorUser;
 import symbolics.division.spirit_vector.logic.vector.SpiritVector;
@@ -12,7 +14,8 @@ public class EngineSoundInstance extends MovingSoundInstance {
     public static boolean shouldPlayFor(PlayerEntity player) {
         return !player.isRemoved()
                 && SpiritVector.hasEquipped(player)
-                && !player.isInFluid();
+			&& !player.isInFluid()
+			&& (player != MinecraftClient.getInstance().player || ConfigProfile.playSound());
     }
 
     private static final float VOLUME_RELATIVE = 0.25f;
