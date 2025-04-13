@@ -1,16 +1,17 @@
 package symbolics.division.spirit_vector.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +23,9 @@ import symbolics.division.spirit_vector.logic.vector.SpiritVector;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
+	@Shadow
+	public abstract boolean isInCreativeMode();
+
 	private LivingEntityMixin(EntityType<?> type, World world) {
 		super(type, world);
 	}
@@ -42,6 +46,8 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 		}
 		if (dbsv$isSVUser) {
+			if (((LivingEntity) (Object) this) instanceof PlayerEntity player && player.getAbilities().flying)
+				return null;
 			return ((ISpiritVectorUser) this).spiritVector();
 		}
 		return null;
@@ -109,16 +115,12 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 	}
 
-	@Inject(method = "takeKnockback", at = @At("HEAD"), cancellable = true)
-	public void takeKnockback(double strength, double x, double z, CallbackInfo ci, @Local(ordinal = 0) LocalDoubleRef strRef) {
-		if (maybeGetSpiritVector() != null) {
-			strRef.set(0);
-			// also needs networking for momentum-based resistance
-//			var state = this.getAttached(SVEntityState.ATTACHMENT);
-//			if (state != null && state.wingsVisible()) {
-//				strRef.set(strength / 10);
-//			}
-		}
+	@WrapWithCondition(
+		method = "damage",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;scheduleVelocityUpdate()V")
+	)
+	public boolean preventLowDamageVelocityUpdate(LivingEntity instance) {
+		return !SpiritVector.hasEquipped((LivingEntity) (Object) this);
 	}
 
 	@Inject(method = "setSprinting", at = @At("HEAD"), cancellable = true)

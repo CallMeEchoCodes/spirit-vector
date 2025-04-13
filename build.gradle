@@ -113,6 +113,7 @@ modrinth {
 	syncBodyFrom = rootProject.file("README.md").text
 	dependencies {
 		required.version libs.fapi.get().getName(), libs.versions.fapi.get()
+		required.version "cloth-config", "15.0.140+fabric"
 		optional.version libs.dancerizer.get().getName(), libs.versions.dancerizer.get()
 		optional.version libs.zipline.get().getName(), libs.versions.zipline.get()
 	}
