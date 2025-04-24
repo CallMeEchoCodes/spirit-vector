@@ -43,6 +43,20 @@ public class SpellDimension {
 		spellCallback.accept(spell);
 	}
 
+	public void cancel() {
+		for (Spell s : activeSpells) {
+			s.setCancelled();
+		}
+		int ticksLeft = Integer.MAX_VALUE;
+		for (var entry : eidosTracker.entrySet()) {
+			ticksLeft = Math.min(entry.getValue().ticksLeft, ticksLeft);
+		}
+
+		for (var entry : eidosTracker.entrySet()) {
+			entry.getValue().ticksLeft -= ticksLeft;
+		}
+	}
+
 	public void tick() {
 		if (!(world.isClient || SpiritVectorMod.PHYSICAL_SERVER)) {
 			throw new RuntimeException("Integrated server spell dimension must never be ticked.");

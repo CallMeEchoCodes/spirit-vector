@@ -5,6 +5,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import symbolics.division.spirit_vector.SpiritVectorMod;
+import symbolics.division.spirit_vector.SpiritVectorSounds;
 import symbolics.division.spirit_vector.logic.TravelMovementContext;
 import symbolics.division.spirit_vector.logic.ability.WildMagicAbility;
 import symbolics.division.spirit_vector.logic.input.Arrow;
@@ -12,6 +13,7 @@ import symbolics.division.spirit_vector.logic.input.ArrowManager;
 import symbolics.division.spirit_vector.logic.input.Input;
 import symbolics.division.spirit_vector.logic.input.InputManager;
 import symbolics.division.spirit_vector.logic.spell.Spell;
+import symbolics.division.spirit_vector.logic.spell.SpellDimension;
 import symbolics.division.spirit_vector.logic.spell.SpellFXEvents;
 import symbolics.division.spirit_vector.logic.spell.StochasticSpell;
 import symbolics.division.spirit_vector.logic.state.ManagedState;
@@ -55,6 +57,24 @@ public class SpellMovement extends NeutralMovement {
 			SpellFXEvents.activateRuneMatrix();
 			return true;
 		}
+
+		SpellDimension sd = sv.user.getWorld().spellDimension();
+		boolean casting = sd.isCasting();
+
+		// cancel spells
+		// cancel early
+		if (!sv.user.isOnGround() &&
+			sv.user.getWorld().spellDimension().isCasting() &&
+			sv.inputManager().pressed(Input.CROUCH) &&
+			sv.inputManager().pressed(Input.SPRINT) &&
+			sv.inputManager().pressed(Input.JUMP)) {
+			sv.inputManager().consume(Input.CROUCH);
+			sv.inputManager().consume(Input.SPRINT);
+			sv.inputManager().consume(Input.JUMP);
+			sv.user.getWorld().spellDimension().cancel();
+			sv.user.playSound(SpiritVectorSounds.RUNE_MATRIX_START);
+		}
+
 		return false;
 	}
 

@@ -26,6 +26,9 @@ public abstract class LivingEntityMixin extends Entity {
 	@Shadow
 	public abstract boolean isInCreativeMode();
 
+	@Shadow
+	public abstract boolean isClimbing();
+
 	private LivingEntityMixin(EntityType<?> type, World world) {
 		super(type, world);
 	}
@@ -57,7 +60,7 @@ public abstract class LivingEntityMixin extends Entity {
 	public void travel(Vec3d movementInput, CallbackInfo ci) {
 		SpiritVector sv = maybeGetSpiritVector();
 		if (sv != null) {
-			if (!this.isLogicalSideForUpdatingMovement() || this.hasVehicle() || ((LivingEntity) (Entity) this).isFallFlying() || this.isSubmergedInWater()) {
+			if (!this.isLogicalSideForUpdatingMovement() || this.hasVehicle() || ((LivingEntity) (Entity) this).isFallFlying() || this.isSubmergedInWater() || this.isClimbing()) {
 				return;
 			}
 			sv.travel(movementInput, ci);
@@ -67,7 +70,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "getMovementSpeed", at = @At("HEAD"), cancellable = true)
 	public void getMovementSpeed(float slip, CallbackInfoReturnable<Float> ci) {
 		SpiritVector sv = maybeGetSpiritVector();
-		if (sv != null) {
+		if (sv != null && !this.isClimbing()) {
 			ci.setReturnValue(sv.getMovementSpeed(slip));
 			ci.cancel();
 		}
@@ -109,7 +112,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "hasNoDrag", at = @At("HEAD"), cancellable = true)
 	public void hasNoDrag(CallbackInfoReturnable<Boolean> ci) {
 		SpiritVector sv = maybeGetSpiritVector();
-		if (sv != null && sv.getMoveState().disableDrag(sv)) {
+		if (sv != null && sv.getMoveState().disableDrag(sv) && !this.isClimbing()) {
 			ci.setReturnValue(true);
 			ci.cancel();
 		}

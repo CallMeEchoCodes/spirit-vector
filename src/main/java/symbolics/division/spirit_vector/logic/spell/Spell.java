@@ -87,6 +87,11 @@ public class Spell {
 		}
 	}
 
+	public void setCancelled() {
+		ticksLeft = 0;
+		cancelled = true;
+	}
+
 	public void tick(SpellDimension spellDimension) {
 		if (!sv.user.isAlive() ||
 			sv.user.isRemoved() ||
